@@ -1,0 +1,40 @@
+## Venus
+URL Shortener System: supported for at least 10 years, and supports small-scale clusters QPS: 100K/s
+
+## Support Protocol
+- HTTP
+- TCP/IP
+
+HTTP protocol uses RESTful API and TCP/IP protocol uses Server/Client mode
+
+## Metrics
+
+## Links
+
+* [Web Site]()
+* [Downloads]()
+* [Documentation]()
+* [Official Discord server]()
+
+## Security
+
+- Complete SSL/TLS and StartTLS support
+
+## How to build
+
+For the detailed information about building and developing Venus, please visit the [developer guide](). This page only
+gives very basic information.
+
+You require the following to build Venus:
+
+* Latest stable [OpenJDK 21](https://adoptium.net/)
+* Latest stable [Gradle](https://docs.gradle.org/)
+
+Note that this is build-time requirement. JDK-21 is enough to run your Venus-based application.
+
+## Branches to look
+
+Development of all versions takes place in each branch whose name is identical to <majorVersion>.<minorVersion>. For
+example, the development of master resides in the branch 'master' respectively.
+  
+
