@@ -25,7 +25,11 @@ repositories {
 }
 
 dependencies {
+	implementation("ch.qos.logback:logback-classic:1.5.7")
+	implementation("mysql:mysql-connector-java:8.0.32")
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa:3.3.3")
+	implementation("org.springframework.boot:spring-boot-starter-jdbc:3.3.3")
+	implementation("com.zaxxer:HikariCP:5.1.0")
 	implementation("org.springframework.boot:spring-boot-starter-actuator")
 	implementation("org.springframework.boot:spring-boot-starter-web")
 	compileOnly("org.projectlombok:lombok")

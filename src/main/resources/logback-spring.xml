@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<configuration debug="false">
+   <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+   <springProperty scope="context" name="appName" source="spring.application.name"/>
+   <springProperty scope="context" name="logLevel" source="logging.level" defaultValue="INFO"/>
+   <springProperty scope="context" name="logPath" source="logging.file.path" defaultValue="logs"/>
+
+   <conversionRule conversionWord="ip" converterClass="org.venus.log.IPConverter"/>
+   <conversionRule conversionWord="hostname" converterClass="org.venus.log.HostNameConverter"/>
+
+   <property name="LOG_PATH" value="${logPath}" default=""/>
+   <property name="LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS} %-5p [%thread] %c{32} [${appName}, %hostname, %ip] %m%n"/>
+
+  <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+       <pattern>${LOG_PATTERN}</pattern>
+      <charset>utf8</charset>
+    </encoder>
+  </appender>
+
+  <appender name="CONSOLE_ASYNC" class="ch.qos.logback.classic.AsyncAppender">
+      <queueSize>64</queueSize>
+      <neverBlock>true</neverBlock>
+      <appender-ref ref="CONSOLE"/>
+  </appender>
+
+  <appender name="DEFAULT-APPENDER" class="ch.qos.logback.core.rolling.RollingFileAppender">
+      <file>${logPath}/common-default.log</file>
+      <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+         <fileNamePattern>${logPath}/common-default.log.%d{yyyy-MM-dd}.%i</fileNamePattern>
+        <maxFileSize>100MB</maxFileSize>
+        <maxHistory>7</maxHistory>
+        <totalSizeCap>2GB</totalSizeCap>
+      </rollingPolicy>
+      <encoder>
+        <pattern>${LOG_PATTERN}</pattern>
+        <charset>utf8</charset>
+      </encoder>
+  </appender>
+
+  <appender name="DEFAULT-APPENDER_ASYNC" class="ch.qos.logback.classic.AsyncAppender">
+    <queueSize>64</queueSize>
+    <neverBlock>true</neverBlock>
+    <appender-ref ref="DEFAULT-APPENDER"/>
+  </appender>
+
+  <appender name="ERROR-APPENDER" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>${logPath}/common-error.log</file>
+    <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+      <fileNamePattern>${logPath}/common-error.log.%d{yyyy-MM-dd}.%i</fileNamePattern>
+      <maxFileSize>100MB</maxFileSize>
+      <maxHistory>30</maxHistory>
+      <totalSizeCap>10GB</totalSizeCap>
+    </rollingPolicy>
+    <encoder>
+      <pattern>${LOG_PATTERN}</pattern>
+      <charset>utf8</charset>
+    </encoder>
+  </appender>
+
+  <appender name="ERROR-APPENDER_ASYNC" class="ch.qos.logback.classic.AsyncAppender">
+    <queueSize>64</queueSize>
+    <neverBlock>true</neverBlock>
+    <appender-ref ref="ERROR-APPENDER"/>
+  </appender>
+
+  <appender name="BIZ-APPENDER" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>${logPath}/common-biz.log</file>
+    <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+      <fileNamePattern>${logPath}/common-biz.log.%d{yyyy-MM-dd}.%i</fileNamePattern>
+      <maxFileSize>1MB</maxFileSize>
+      <maxHistory>30</maxHistory>
+      <totalSizeCap>10GB</totalSizeCap>
+    </rollingPolicy>
+    <encoder>
+      <pattern>${LOG_PATTERN}</pattern>
+      <charset>utf8</charset>
+    </encoder>
+  </appender>
+
+  <appender name="BIZ-APPENDER_ASYNC" class="ch.qos.logback.classic.AsyncAppender">
+    <queueSize>64</queueSize>
+    <neverBlock>true</neverBlock>
+    <appender-ref ref="BIZ-APPENDER"/>
+  </appender>
+
+  <springProfile name="prod">
+    <logger name="org.venus" level="${logLevel}" additivity="false">
+      <appender-ref ref="ERROR-APPENDER_ASYNC"/>
+      <appender-ref ref="BIZ-APPENDER_ASYNC"/>
+    </logger>
+    <root level="${logLevel}">
+      <appender-ref ref="DEFAULT-APPENDER_ASYNC"/>
+      <appender-ref ref="ERROR-APPENDER_ASYNC"/>
+    </root>
+  </springProfile>
+
+  <springProfile name="!prod">
+    <logger name="org.venus" level="DEBUG" additivity="false">
+      <appender-ref ref="CONSOLE_ASYNC"/>
+    </logger>
+    <root level="${logLevel}">
+      <appender-ref ref="CONSOLE_ASYNC"/>
+    </root>
+  </springProfile>
+</configuration>

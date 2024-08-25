@@ -1,4 +1,4 @@
-package org.venus.admin.entiy;
+package org.venus.admin.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -20,7 +20,7 @@ import lombok.Setter;
 @Table(name = "links")
 public class Links {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     @Column(name = "code",unique = true)
     private String code;

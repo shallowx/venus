@@ -1,10 +1,10 @@
-package org.venus.admin.dal;
+package org.venus.admin.repository;
 
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
-import org.venus.admin.entiy.Geo;
+import org.venus.admin.entity.Geo;
 
 @Repository
 public interface GeoRepository extends JpaRepository<Geo, Long> {
@@ -13,5 +13,5 @@ public interface GeoRepository extends JpaRepository<Geo, Long> {
     List<Geo> lists();
 
     @Query(value = "SELECT g FROM Geo g WHERE g.id = :id")
-    Geo findGeoById(long id);
+    Geo getGeo(long id);
 }

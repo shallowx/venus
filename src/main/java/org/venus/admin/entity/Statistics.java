@@ -1,8 +1,9 @@
-package org.venus.admin.entiy;
+package org.venus.admin.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
@@ -19,7 +20,7 @@ import lombok.Setter;
 @Table(name = "statistics")
 public class Statistics {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     @Column(name = "link_id")
     private long linkId;
