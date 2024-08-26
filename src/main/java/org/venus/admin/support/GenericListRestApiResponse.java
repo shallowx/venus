@@ -2,7 +2,11 @@ package org.venus.admin.support;
 
 import java.io.Serial;
 import java.util.List;
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
+@Setter
 @SuppressWarnings("rawtypes")
 public class GenericListRestApiResponse<T> extends AbstractRestApiResponse {
     @Serial
@@ -32,6 +36,14 @@ public class GenericListRestApiResponse<T> extends AbstractRestApiResponse {
         response.success = false;
         response.message = message;
         response.code = code.code();
+        return response;
+    }
+
+    public static <T> GenericListRestApiResponse<T> fail(String code, String message) {
+        GenericListRestApiResponse<T> response = new GenericListRestApiResponse<>();
+        response.success = false;
+        response.message = message;
+        response.code = Integer.parseInt(code);
         return response;
     }
 }

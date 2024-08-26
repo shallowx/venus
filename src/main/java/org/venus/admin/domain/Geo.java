@@ -1,4 +1,4 @@
-package org.venus.admin.entity;
+package org.venus.admin.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
