@@ -1,6 +1,10 @@
-package org.venus.admin.support;
+package org.venus.support;
+
+import java.io.Serial;
 
 public class VenusAdminException extends RuntimeException {
+    @Serial
+    private static final long serialVersionUID = -4731708405228264641L;
 
     public VenusAdminException() {
     }

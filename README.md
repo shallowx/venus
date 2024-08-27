@@ -1,5 +1,7 @@
 ## Venus
 URL Shortener System: supported for at least 10 years, and supports small-scale clusters QPS: 100K/s
+- The function of the 'admin(package)' is to provide web management UI support
+- The function of the 'openapi(package)' is to The function of openapi (package) is to provide third-party queries and data analysis reports
 
 ## Support Protocol
 - HTTP

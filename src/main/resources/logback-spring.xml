@@ -5,8 +5,8 @@
    <springProperty scope="context" name="logLevel" source="logging.level" defaultValue="INFO"/>
    <springProperty scope="context" name="logPath" source="logging.file.path" defaultValue="logs"/>
 
-   <conversionRule conversionWord="ip" converterClass="org.venus.log.IPConverter"/>
-   <conversionRule conversionWord="hostname" converterClass="org.venus.log.HostNameConverter"/>
+   <conversionRule conversionWord="ip" converterClass="org.venus.support.IPConverter"/>
+   <conversionRule conversionWord="hostname" converterClass="org.venus.support.HostNameConverter"/>
 
    <property name="LOG_PATH" value="${logPath}" default=""/>
    <property name="LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS} %-5p [%thread] %c{32} [${appName}, %hostname, %ip] %m%n"/>

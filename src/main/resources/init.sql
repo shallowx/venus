@@ -2,12 +2,13 @@ CREATE DATABASE venus;
 
 CREATE TABLE links (
      id BIGINT PRIMARY KEY COMMENT 'Unique identifier for each short link',
-     code VARCHAR(8) NOT NULL UNIQUE COMMENT 'Unique code for the short link, e.g., abc123',
+     code VARCHAR(8) UNIQUE NOT NULL UNIQUE COMMENT 'Unique code for the short link, e.g., abc123',
      original_url varchar(500) NOT NULL COMMENT 'The original long URL',
      created_at DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT 'Timestamp when the short link was created',
      redirect INT(1) DEFAULT 302 COMMENT 'redirect code: 301 or 302',
      expires_at DATETIME COMMENT 'Expiration timestamp for the short link, if applicable',
-     is_active TINYINT(1) DEFAULT 1 COMMENT 'Indicates if the short link is currently active, 0 = inactive, 1 = active'
+     is_active TINYINT(1) DEFAULT 1 COMMENT 'Indicates if the short link is currently active, 0 = inactive, 1 = active',
+     INDEX idx_original_url (original_url)
 ) ENGINE=InnoDB;
 
 CREATE TABLE statistics (

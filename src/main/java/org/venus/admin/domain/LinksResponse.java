@@ -1,22 +1,14 @@
 package org.venus.admin.domain;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Id;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import org.hibernate.validator.constraints.Length;
-import org.venus.admin.annotations.FutureDate;
 
 @Data
 @AllArgsConstructor
@@ -24,16 +16,15 @@ import org.venus.admin.annotations.FutureDate;
 @ToString
 @Builder
 public class LinksResponse {
-    @Id
     private long id;
     private String code;
-    private short redirect;
+    private int redirect;
     private String originalUrl;
     private LocalDateTime createdAt;
     private LocalDateTime expiresAt;
     private boolean isActive;
 
-    public static LinksResponse from(Links links) {
+    public static LinksResponse from(LinksEntity links) {
         return LinksResponse.builder()
                 .id(links.getId())
                 .code(links.getCode())
@@ -45,15 +36,12 @@ public class LinksResponse {
                 .build();
     }
 
-    public static List<LinksResponse> from(List<Links> links) {
+    public static List<LinksResponse> from(List<LinksEntity> links) {
         if (links == null || links.isEmpty()) {
             return Collections.emptyList();
         }
-
-        List<LinksResponse> responses = new ArrayList<>(links.size());
-        for (Links link : links) {
-            responses.add(LinksResponse.from(link));
-        }
-        return responses;
+        return links.stream()
+                .map(LinksResponse::from)
+                .collect(Collectors.toList());
     }
 }

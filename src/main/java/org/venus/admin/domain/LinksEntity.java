@@ -5,7 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,13 +17,13 @@ import lombok.Setter;
 @Setter
 @Entity
 @Table(name = "links")
-public class Links {
+public class LinksEntity {
     @Id
     private long id;
     @Column(name = "code",unique = true)
     private String code;
     @Column(name = "redirect",unique = true)
-    private short redirect;
+    private int redirect;
     @Column(name = "original_url",unique = true, length = 500)
     private String originalUrl;
     @Column(name = "created_at")

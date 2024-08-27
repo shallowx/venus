@@ -20,14 +20,18 @@ import org.venus.admin.annotations.FutureDate;
 @ToString
 public class LinksRequest {
 
-    // need to ensure its unique
+    /**
+     * need to ensure {@code id} its unique
+     */
     @NotNull(message = "The links mapping id cannot be empty")
     @Min(value = 0, message = "The links mapping id min-value is 0")
     @Max(value = Long.MAX_VALUE, message = "The links mapping id max-value is 0x7fffffffffffffffL")
     private long id;
 
-    // if {@code code} is not null, need to ensure its unique and its length must be 8, and it needs to conform to 62-bit encoded characters, eg:[0-9] [a-z] [A-Z]
-    // if its null, it will create by venus system.
+    /**
+     *  if {@code code} is not null, need to ensure its unique and its length must be 8, and it needs to conform to 62-bit encoded characters, eg:[0-9] [a-z] [A-Z]
+     *  if its null, it will create by venus system.
+     */
     @Length(min = 0, max = 8, message = "The links code character length must be 8")
     private String code;
 

@@ -1,4 +1,4 @@
-package org.venus.admin.support;
+package org.venus.support;
 
 import java.io.Serial;
 import java.io.Serializable;
