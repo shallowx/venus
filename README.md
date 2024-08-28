@@ -7,8 +7,9 @@ URL Shortener System: supports large-scale clusters
 - theme: Core redirect function implementation
 - Mac Pro(12C16G)
 - VM: 12G(heap)、+UseZGC
-- time: 300s
-- Thread count: 1000
+- Loop Couunt: Infinite
+- specify thread lifetime duration(s): 300
+- number of thread(users): 1000
 - performance-report
 ```java
 summary + 557742  in 00:00:16 = 35466.2/s Avg:    14 Min:     0 Max:   142 Err:     0 (0.00%) Active: 1000 Started: 1000 Finished: 0
