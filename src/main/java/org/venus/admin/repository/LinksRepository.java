@@ -14,6 +14,7 @@ import org.venus.admin.domain.LinksDao;
 public interface LinksRepository extends JpaRepository<LinksEntity, Long> {
     @Query(value = "SELECT * FROM links", nativeQuery = true)
     List<LinksEntity> list();
+
     @Query(value = "SELECT * FROM links WHERE id=:id", nativeQuery = true)
     LinksEntity get(@Param("id") long id);
 

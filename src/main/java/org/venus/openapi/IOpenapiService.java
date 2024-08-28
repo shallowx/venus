@@ -1,7 +1,11 @@
 package org.venus.openapi;
 
-public interface IOpenapiService {
-    OpenapiEntity get(String original);
+import java.util.List;
 
-    RedirectEntity redirect(String original);
+public interface IOpenapiService {
+    OpenapiEntity get(String encode);
+    List<OpenapiEntity> lists();
+
+    OpenapiEntity redirect(String original);
+
 }

@@ -11,5 +11,4 @@ public class VenusApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(VenusApplication.class, args);
 	}
-
 }

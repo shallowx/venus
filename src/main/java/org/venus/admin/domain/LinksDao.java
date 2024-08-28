@@ -1,7 +1,6 @@
 package org.venus.admin.domain;
 
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.venus.codec.DefaultBase62Encoder;
+import org.venus.admin.service.DefaultBase62Encoder;
 
 @Getter
 @Setter

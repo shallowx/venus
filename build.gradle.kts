@@ -25,6 +25,13 @@ repositories {
 }
 
 dependencies {
+	implementation("org.apache.commons:commons-pool2:2.12.0")
+	implementation("org.springframework.boot:spring-boot-starter-aop:3.3.3")
+	implementation("org.springframework.boot:spring-boot-starter-data-redis:3.3.3")
+	implementation("com.github.ben-manes.caffeine:caffeine:3.1.8")
+	implementation("org.springframework.boot:spring-boot-starter-cache:3.3.3")
+	implementation("io.micrometer:micrometer-registry-jmx:1.13.3")
+	implementation("io.micrometer:micrometer-registry-prometheus:1.13.3")
 	implementation("org.springframework.boot:spring-boot-starter-validation:3.3.3")
 	implementation("ch.qos.logback:logback-classic:1.5.7")
 	implementation("mysql:mysql-connector-java:8.0.32")

@@ -1,6 +1,7 @@
 package org.venus.admin.configuration;
 
 import com.zaxxer.hikari.HikariDataSource;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,31 +14,27 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Configuration(proxyBeanMethods = false)
+@EnableConfigurationProperties(DatasourceProperties.class)
 public class DynamicDataSourcesAutoConfiguration {
-
-    public static final String DRIVER_CLASS_NAME = "spring.datasource.default.driver-class-name";
-    public static final String DATASOURCE_URL = "spring.datasource.default.url";
-    public static final String DATASOURCE_USERNAME = "spring.datasource.default.username";
-    public static final String DATASOURCE_PASSWORD = "spring.datasource.default.password";
     public static final String DEFAULT_DATASOURCE_NAME = "default";
 
     @Bean(name = "dynamicDataSource")
     @Primary
-    public DynamicDataSource dynamicDataSource(final Environment environment) {
-        DataSource defaultDataSource = defaultDataSource(environment);
+    public DynamicDataSource dynamicDataSource(DatasourceProperties properties) {
+        DataSource defaultDataSource = defaultDataSource(properties);
         DynamicDataSource dynamicDataSource = new DynamicDataSource();
         dynamicDataSource.addDataSource(DEFAULT_DATASOURCE_NAME, defaultDataSource);
         dynamicDataSource.setDefaultTargetDataSource(defaultDataSource);
         return dynamicDataSource;
     }
 
-    private DataSource defaultDataSource(final Environment environment) {
-        String driverName = environment.getProperty(DRIVER_CLASS_NAME);
-        String url = environment.getProperty(DATASOURCE_URL);
-        String username = environment.getProperty(DATASOURCE_USERNAME);
-        String password = environment.getProperty(DATASOURCE_PASSWORD);
+    private DataSource defaultDataSource(DatasourceProperties properties) {
+        String driverClassName = properties.getDriverClassName();
+        String url = properties.getUrl();
+        String username = properties.getUsername();
+        String password = properties.getPassword();
         return DataSourceBuilder.create()
-                .driverClassName(driverName)
+                .driverClassName(driverClassName)
                 .type(HikariDataSource.class)
                 .url(url)
                 .username(username)

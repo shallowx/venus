@@ -3,7 +3,7 @@ CREATE DATABASE venus;
 CREATE TABLE links (
      id BIGINT PRIMARY KEY COMMENT 'Unique identifier for each short link',
      code VARCHAR(8) UNIQUE NOT NULL UNIQUE COMMENT 'Unique code for the short link, e.g., abc123',
-     original_url varchar(500) NOT NULL COMMENT 'The original long URL',
+     original_url varchar(500) UNIQUE NOT NULL COMMENT 'The original URL',
      created_at DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT 'Timestamp when the short link was created',
      redirect INT(1) DEFAULT 302 COMMENT 'redirect code: 301 or 302',
      expires_at DATETIME COMMENT 'Expiration timestamp for the short link, if applicable',

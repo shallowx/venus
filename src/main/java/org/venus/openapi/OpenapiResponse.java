@@ -1,8 +1,12 @@
 package org.venus.openapi;
 
 import lombok.*;
+import org.venus.admin.domain.GeoResponse;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -18,7 +22,7 @@ public class OpenapiResponse {
     private LocalDateTime expiresAt;
     private boolean isActive;
 
-    public static OpenapiResponse form(OpenapiEntity entity) {
+    public static OpenapiResponse from(OpenapiEntity entity) {
         return OpenapiResponse.builder()
                 .code(entity.getCode())
                 .originalUrl(entity.getOriginalUrl())
@@ -26,5 +30,14 @@ public class OpenapiResponse {
                 .expiresAt(entity.getExpiresAt())
                 .isActive(entity.getIsActive() != 0)
                 .build();
+    }
+
+    public static List<OpenapiResponse> from(List<OpenapiEntity> entities) {
+        if (entities == null || entities.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return entities.stream()
+                .map(OpenapiResponse::from)
+                .collect(Collectors.toList());
     }
 }
