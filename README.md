@@ -4,6 +4,7 @@ URL Shortener System: supports large-scale clusters
 - The function of the 'openapi(package)' is to provide third-party queries, redirect and data analysis reports
 
 ## Performance
+- theme: Core redirect function implementation
 - Mac Pro(12C16G)
 - VM: 12G(heap)、+UseZGC
 - time: 300s
