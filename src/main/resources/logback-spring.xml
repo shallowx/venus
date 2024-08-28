@@ -96,7 +96,7 @@
   </springProfile>
 
   <springProfile name="!prod">
-    <logger name="org.venus" level="DEBUG" additivity="false">
+    <logger name="org.venus" level="INFO" additivity="false">
       <appender-ref ref="CONSOLE_ASYNC"/>
     </logger>
     <root level="${logLevel}">

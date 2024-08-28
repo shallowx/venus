@@ -79,6 +79,7 @@ public class OpenapiRestController {
 
     /**
      * If redirection through this system is required and need to record the redirect result
+     *
      */
     @GetMapping("/redirect")
     public ResponseEntity<Void> redirect(@RequestParam @NotEmpty @Validated String encode) {

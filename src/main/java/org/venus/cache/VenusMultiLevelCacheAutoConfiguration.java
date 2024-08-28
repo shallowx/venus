@@ -8,10 +8,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
+import org.springframework.boot.autoconfigure.AutoConfigureOrder;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.DependsOn;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.PatternTopic;
@@ -23,15 +28,10 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 import static org.venus.cache.VenusMultiLevelCacheConstants.DEFAULT_LISTENER_NAME;
 
+@AutoConfigureOrder(Ordered.LOWEST_PRECEDENCE)
 @Configuration(proxyBeanMethods = false)
 @EnableConfigurationProperties(VenusMultiLevelCacheProperties.class)
-@AutoConfigureAfter(VenusMultiLevelCacheAutoConfiguration.MessageListenerAutoConfiguration.class)
 public class VenusMultiLevelCacheAutoConfiguration {
-
-    @Bean(initMethod = "init")
-    public VenusInitializer venusInitializer(ApplicationContext context) {
-        return new VenusInitializer(context);
-    }
 
     @Configuration(proxyBeanMethods = false)
     static class VenusMultiLevelCacheRedisAutoConfiguration {
@@ -78,6 +78,8 @@ public class VenusMultiLevelCacheAutoConfiguration {
         }
     }
 
+    @ConditionalOnBean(VenusInitializer.class)
+    @DependsOn("venusInitializer")
     @Bean
     public VenusMultiLevelCacheManager venusMultiLevelCacheManager(RedisTemplate<String, CacheWrapper> template, VenusMultiLevelCacheProperties properties) {
         return new VenusMultiLevelCacheManager(properties, template);

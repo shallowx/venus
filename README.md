@@ -3,6 +3,11 @@ URL Shortener System: supports large-scale clusters
 - The function of the 'admin(package)' is to provide web management UI support
 - The function of the 'openapi(package)' is to provide third-party queries, redirect and data analysis reports
 
+## Performance
+- Mac Pro(12C16G)
+- VM: 12G(heap)、+UseZGC
+- [performance-report]()
+
 ## Support Protocol
 - HTTP
 - TCP/IP
