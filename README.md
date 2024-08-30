@@ -1,3 +1,5 @@
+![Build project](https://github.com/shallowx/venus/blob/master/doc/badge.svg)
+
 ## Venus
 URL Shortener System: supports large-scale clusters
 - System support multi-level cache ensure venus performance by itself
@@ -6,6 +8,7 @@ URL Shortener System: supports large-scale clusters
 
 ## Architecture
 
+![architecture](https://github.com/shallowx/venus/blob/master/doc/architecture.png)
 
 
 ## Performance
