@@ -119,7 +119,7 @@ public class VenusMultiLevelValueAdaptingCache extends AbstractValueAdaptingCach
         try {
             CacheListenerMessage cacheMassage = CacheListenerMessage.builder()
                     .name(this.cacheName)
-                    .type(CacheMessageListenerType.INVALIDATE)
+                    .type(CacheMessageListenerType.UPDATE)
                     .value(value)
                     .key((String) key)
                     .source(ListenerSourceSupport.getSourceAddress())

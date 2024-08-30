@@ -1,16 +1,24 @@
 ## Venus
 URL Shortener System: supports large-scale clusters
+- System support multi-level cache ensure venus performance by itself
 - The function of the 'admin(package)' is to provide web management UI support
 - The function of the 'openapi(package)' is to provide third-party queries, redirect and data analysis reports
 
+## Architecture
+
+
+
 ## Performance
-- theme: Core redirect function implementation
+### Theme
+- Core redirect function implementation
+### Stress testing environment
 - Mac Pro(12C16G)
 - VM: 12G(heap)、+UseZGC
 - Loop Couunt: Infinite
 - specify thread lifetime duration(s): 300
 - number of thread(users): 1000
-- performance-report
+
+performance-report
 ```java
 summary + 557742  in 00:00:16 = 35466.2/s Avg:    14 Min:     0 Max:   142 Err:     0 (0.00%) Active: 1000 Started: 1000 Finished: 0
 summary + 1131290 in 00:00:30 = 37723.5/s Avg:    18 Min:     0 Max:   195 Err:     0 (0.00%) Active: 1000 Started: 1000 Finished: 0
@@ -42,6 +50,7 @@ summary =10926237 in 00:05:00 = 36379.7/s Avg:    20 Min:     0 Max:   267 Err: 
 HTTP protocol uses RESTful API and TCP/IP protocol uses Server/Client mode
 
 ## Metrics
+- see this package 'org.venus.metrics'
 
 ## Links
 

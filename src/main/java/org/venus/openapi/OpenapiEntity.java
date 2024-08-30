@@ -66,4 +66,17 @@ public class OpenapiEntity implements Serializable {
     public int hashCode() {
         return Objects.hash(code, redirect, originalUrl, createdAt, expiresAt, isActive);
     }
+
+    @Override
+    public String toString() {
+        return "OpenapiEntity{" +
+                "id=" + id +
+                ", code='" + code + '\'' +
+                ", redirect=" + redirect +
+                ", originalUrl='" + originalUrl + '\'' +
+                ", createdAt=" + createdAt +
+                ", expiresAt=" + expiresAt +
+                ", isActive=" + isActive +
+                '}';
+    }
 }
