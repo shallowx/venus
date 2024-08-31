@@ -4,11 +4,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.net.Inet6Address;
-import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.net.SocketException;
-import java.net.UnknownHostException;
+import java.net.*;
 import java.util.Enumeration;
 import java.util.Objects;
 
@@ -28,7 +24,7 @@ public class InetAddressEndpoint {
                 if ((now - expires) < MAX_EXPIRES) {
                     inetAddress = cachedInetAddress;
                 } else {
-                    cachedInetAddress =  null;
+                    cachedInetAddress = null;
                 }
             }
 
@@ -71,9 +67,9 @@ public class InetAddressEndpoint {
 
     private static InetAddress innerInetAddress() throws SocketException, UnknownHostException {
         InetAddress address = null;
-        for (Enumeration<NetworkInterface> e = NetworkInterface.getNetworkInterfaces(); e.hasMoreElements();) {
+        for (Enumeration<NetworkInterface> e = NetworkInterface.getNetworkInterfaces(); e.hasMoreElements(); ) {
             NetworkInterface ni = e.nextElement();
-            for (Enumeration<InetAddress> ee = ni.getInetAddresses(); ee.hasMoreElements();) {
+            for (Enumeration<InetAddress> ee = ni.getInetAddresses(); ee.hasMoreElements(); ) {
                 InetAddress addr = ee.nextElement();
                 if (!addr.isLoopbackAddress() && !(addr instanceof Inet6Address)) {
                     if (addr.isSiteLocalAddress()) {

@@ -1,9 +1,10 @@
 package org.venus.support;
 
-import java.io.Serial;
-import java.io.Serializable;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.io.Serial;
+import java.io.Serializable;
 
 @Getter
 @Setter

@@ -26,23 +26,23 @@ public class RedisMessageReceiver {
             return;
         }
 
-        if (clm.getSource().equals(ListenerSourceSupport.getSourceAddress())){
+        if (clm.getSource().equals(ListenerSourceSupport.getSourceAddress())) {
             if (log.isDebugEnabled()) {
                 log.debug("The own service sends messages without updating the cache.");
             }
             return;
         }
 
-        CacheSelector selector = (VenusMultiLevelCacheManager)manager.getCache(clm.getName());
+        CacheSelector selector = (VenusMultiLevelCacheManager) manager.getCache(clm.getName());
         Cache<String, CacheWrapper> primaryCache = selector.primaryCache();
-        if (clm.getType()== CacheMessageListenerType.UPDATE) {
+        if (clm.getType() == CacheMessageListenerType.UPDATE) {
             primaryCache.put(clm.getKey(), CacheWrapper.builder()
-                                                        .key(clm.getKey())
-                                                        .value(clm.getValue())
-                                                        .build());
+                    .key(clm.getKey())
+                    .value(clm.getValue())
+                    .build());
         }
 
-        if (clm.getType()== CacheMessageListenerType.INVALIDATE) {
+        if (clm.getType() == CacheMessageListenerType.INVALIDATE) {
             primaryCache.invalidate(clm.getKey());
         }
     }

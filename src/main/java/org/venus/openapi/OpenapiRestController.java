@@ -10,7 +10,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.venus.support.GenericListRestApiResponse;
 import org.venus.support.GenericRestApiResponse;
 import org.venus.support.VenusRestApiCode;
@@ -38,7 +41,7 @@ public class OpenapiRestController {
     /**
      * If redirection through this system is not required, this api is suitable. And redirected by the caller
      * However, if the caller does not report the analysis data, the data may be lost.
-     *
+     * <p>
      * If the caller needs to cache the response, and it needs to register a callback method to update the new data from venus.
      * Register method see 'admin(package)' function
      */
@@ -59,7 +62,7 @@ public class OpenapiRestController {
     /**
      * If redirection through this system is not required, this api is suitable. And redirected by the caller
      * However, if the caller does not report the analysis data, the data may be lost.
-     *
+     * <p>
      * If the caller needs to cache the response, and it needs to register a callback method to update the new data from venus.
      * Register method see 'admin(package)' function
      */
@@ -79,7 +82,6 @@ public class OpenapiRestController {
 
     /**
      * If redirection through this system is required and need to record the redirect result
-     *
      */
     @GetMapping("/redirect")
     public ResponseEntity<Void> redirect(@RequestParam @NotEmpty @Validated String encode) {

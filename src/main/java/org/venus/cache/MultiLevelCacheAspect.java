@@ -1,9 +1,5 @@
 package org.venus.cache;
 
-import io.micrometer.core.instrument.Counter;
-import io.micrometer.core.instrument.MeterRegistry;
-import io.micrometer.core.instrument.Metrics;
-import io.micrometer.core.instrument.Tags;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -18,8 +14,10 @@ import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.common.TemplateParserContext;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
+
 import java.lang.reflect.Method;
 import java.util.TreeMap;
+
 import static org.venus.cache.VenusMultiLevelCacheConstants.DEFAULT_LISTENER_NAME;
 
 @Slf4j
@@ -44,7 +42,7 @@ public class MultiLevelCacheAspect {
         Object[] args = point.getArgs();
         TreeMap<String, Object> treeMap = new TreeMap<>();
         for (int i = 0; i < paramNames.length; i++) {
-            treeMap.put(paramNames[i],args[i]);
+            treeMap.put(paramNames[i], args[i]);
         }
 
         VenusMultiLevelCache annotation = method.getAnnotation(VenusMultiLevelCache.class);
@@ -52,14 +50,14 @@ public class MultiLevelCacheAspect {
         String realKey = annotation.cacheName() + ":" + elResult;
         Cache cache = manager.getCache(DEFAULT_LISTENER_NAME);
 
-        if (annotation.type() == MultiLevelCacheType.PUT){
+        if (annotation.type() == MultiLevelCacheType.PUT) {
             Object object = point.proceed();
             cache.put(realKey, object);
             callback.callback(realKey, object, "update");
             return object;
         }
 
-        if (annotation.type()== MultiLevelCacheType.EVICT){
+        if (annotation.type() == MultiLevelCacheType.EVICT) {
             cache.evict(realKey);
             callback.callback(realKey, null, "evict");
             return point.proceed();
@@ -78,8 +76,8 @@ public class MultiLevelCacheAspect {
         });
     }
 
-    public static String parse(String elString, TreeMap<String,Object> map){
-        elString=String.format("#{%s}",elString);
+    public static String parse(String elString, TreeMap<String, Object> map) {
+        elString = String.format("#{%s}", elString);
         ExpressionParser parser = new SpelExpressionParser();
         EvaluationContext context = new StandardEvaluationContext();
         map.forEach(context::setVariable);

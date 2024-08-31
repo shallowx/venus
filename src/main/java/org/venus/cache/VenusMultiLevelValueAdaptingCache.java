@@ -22,7 +22,7 @@ import static org.venus.cache.VenusMultiLevelCacheConstants.DEFAULT_LISTENER_NAM
 @Slf4j
 public class VenusMultiLevelValueAdaptingCache extends AbstractValueAdaptingCache {
     private String cacheName;
-    private RedisTemplate<String,CacheWrapper> secondCache;
+    private RedisTemplate<String, CacheWrapper> secondCache;
     private Cache<String, CacheWrapper> primaryCache;
     private VenusMultiLevelCacheProperties properties;
 
@@ -75,13 +75,13 @@ public class VenusMultiLevelValueAdaptingCache extends AbstractValueAdaptingCach
     @Override
     public <T> T get(@NonNull Object key, @NonNull Callable<T> valueLoader) {
         try {
-            CacheWrapper wrapper = (CacheWrapper)lookup(key);
+            CacheWrapper wrapper = (CacheWrapper) lookup(key);
             if (wrapper != null) {
                 return (T) wrapper.getValue();
             }
             T t = valueLoader.call();
             synchronized (this) {
-                wrapper = (CacheWrapper)lookup(key);
+                wrapper = (CacheWrapper) lookup(key);
                 if (wrapper != null) {
                     return (T) wrapper.getValue();
                 } else {

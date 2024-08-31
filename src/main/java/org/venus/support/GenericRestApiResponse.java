@@ -1,8 +1,9 @@
 package org.venus.support;
 
-import java.io.Serial;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.io.Serial;
 
 @Getter
 @Setter
@@ -27,7 +28,7 @@ public class GenericRestApiResponse<T> extends AbstractRestApiResponse {
     }
 
     public static <T> GenericRestApiResponse<T> success() {
-       return success(null);
+        return success(null);
     }
 
     public static <T> GenericRestApiResponse<T> fail(VenusRestApiCode code, String message) {

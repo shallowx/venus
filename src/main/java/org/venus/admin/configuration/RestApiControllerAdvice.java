@@ -2,9 +2,6 @@ package org.venus.admin.configuration;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
-
-import java.util.Objects;
-import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
@@ -14,13 +11,15 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerMapping;
-import org.springframework.web.servlet.NoHandlerFoundException;
-import org.springframework.web.servlet.view.RedirectView;
 import org.venus.admin.annotations.RestApiList;
 import org.venus.support.GenericListRestApiResponse;
 import org.venus.support.GenericRestApiResponse;
 import org.venus.support.VenusAdminException;
 import org.venus.support.VenusRestApiCode;
+
+import java.util.Objects;
+import java.util.stream.Collectors;
+
 @Slf4j
 @ControllerAdvice
 public class RestApiControllerAdvice {
@@ -40,7 +39,7 @@ public class RestApiControllerAdvice {
         if (handlerMethod != null && handlerMethod.hasMethodAnnotation(RestApiList.class)) {
             return GenericListRestApiResponse.fail(errors[2], format);
         } else {
-           return GenericRestApiResponse.fail(errors[2], format);
+            return GenericRestApiResponse.fail(errors[2], format);
         }
     }
 
@@ -75,9 +74,9 @@ public class RestApiControllerAdvice {
     }
 
 
-    @ExceptionHandler(value =VenusAdminException.class)
+    @ExceptionHandler(value = VenusAdminException.class)
     @ResponseBody
-    public Object venusAdminExceptionHandler(HttpServletRequest request, VenusAdminException e){
+    public Object venusAdminExceptionHandler(HttpServletRequest request, VenusAdminException e) {
         if (log.isErrorEnabled()) {
             log.error("path:{} - venus admin exception", request.getRequestURL(), e);
         }
@@ -89,9 +88,9 @@ public class RestApiControllerAdvice {
         }
     }
 
-    @ExceptionHandler(value =Exception.class)
+    @ExceptionHandler(value = Exception.class)
     @ResponseBody
-    public Object exceptionHandler(HttpServletRequest request, Exception e){
+    public Object exceptionHandler(HttpServletRequest request, Exception e) {
         if (log.isErrorEnabled()) {
             log.error("path:{} - bad request", request.getRequestURL(), e);
         }

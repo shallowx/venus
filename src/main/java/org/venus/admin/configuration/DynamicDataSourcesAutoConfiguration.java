@@ -6,7 +6,6 @@ import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
-import org.springframework.core.env.Environment;
 import org.springframework.jdbc.datasource.lookup.AbstractRoutingDataSource;
 
 import javax.sql.DataSource;
@@ -59,9 +58,11 @@ public class DynamicDataSourcesAutoConfiguration {
 
     public static class DynamicDataSourceContextHolder {
         private static final ThreadLocal<String> CONTEXT_HOLDER = new ThreadLocal<>();
+
         public static String getDataSourceName() {
             return CONTEXT_HOLDER.get();
         }
+
         public static void setDataSourceName(final String dataSourceName) {
             CONTEXT_HOLDER.set(dataSourceName);
         }

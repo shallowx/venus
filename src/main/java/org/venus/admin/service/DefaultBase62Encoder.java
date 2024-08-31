@@ -3,7 +3,7 @@ package org.venus.admin.service;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class DefaultBase62Encoder implements Encoder{
+public class DefaultBase62Encoder implements Encoder {
     public static final DefaultBase62Encoder INSTANCE = new DefaultBase62Encoder();
 
     private static final char[] ENCODE_CHARS = {
@@ -17,7 +17,7 @@ public class DefaultBase62Encoder implements Encoder{
     @Override
     public String encode(long input) {
         var encode = new StringBuilder();
-        if(input == 0) {
+        if (input == 0) {
             return String.valueOf(ENCODE_CHARS[0]);
         }
 

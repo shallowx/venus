@@ -9,7 +9,10 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 @Service
@@ -45,7 +48,8 @@ public class OpenapiStatisticsReportService implements IOpenapiStatisticsReportS
                 }
                 try {
                     TimeUnit.MILLISECONDS.sleep(statisticsReportProperties.getReportWithoutDataTimeout());
-                } catch (InterruptedException ignored) {}
+                } catch (InterruptedException ignored) {
+                }
             }
         }, statisticsReportProperties.getScheduledDelay(), statisticsReportProperties.getScheduledPeriod(), TimeUnit.MILLISECONDS);
     }
@@ -54,10 +58,11 @@ public class OpenapiStatisticsReportService implements IOpenapiStatisticsReportS
         readWriteLock.writeLock();
         List<OpenapiStatisticsEntity> newEntities;
         try {
-            newEntities= new ArrayList<>(entities);
+            newEntities = new ArrayList<>(entities);
             entities.clear();
-        }finally {
-            readWriteLock.writeLock().unlock();;
+        } finally {
+            readWriteLock.writeLock().unlock();
+            ;
         }
         return newEntities;
     }

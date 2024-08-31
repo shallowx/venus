@@ -7,16 +7,13 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.AutoConfigureOrder;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.core.Ordered;
-import org.springframework.core.annotation.Order;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.PatternTopic;
@@ -94,13 +91,13 @@ public class VenusMultiLevelCacheAutoConfiguration {
         }
 
         @Bean
-        public MessageListenerAdapter adapter(RedisMessageReceiver receiver){
-            return new MessageListenerAdapter(receiver,"receive");
+        public MessageListenerAdapter adapter(RedisMessageReceiver receiver) {
+            return new MessageListenerAdapter(receiver, "receive");
         }
 
         @Bean
         public RedisMessageListenerContainer container(MessageListenerAdapter listenerAdapter,
-                                                RedisConnectionFactory redisConnectionFactory){
+                                                       RedisConnectionFactory redisConnectionFactory) {
             RedisMessageListenerContainer container = new RedisMessageListenerContainer();
             container.setConnectionFactory(redisConnectionFactory);
             container.addMessageListener(listenerAdapter, new PatternTopic(DEFAULT_LISTENER_NAME));

@@ -7,6 +7,8 @@ import java.lang.annotation.*;
 @Documented
 public @interface VenusMultiLevelCache {
     String cacheName();
+
     String key();
+
     MultiLevelCacheType type() default MultiLevelCacheType.ALL;
 }

@@ -7,6 +7,7 @@ import io.micrometer.core.instrument.binder.jvm.*;
 import io.micrometer.core.instrument.binder.system.FileDescriptorMetrics;
 import io.micrometer.core.instrument.binder.system.ProcessorMetrics;
 import io.micrometer.core.instrument.binder.system.UptimeMetrics;
+
 @SuppressWarnings("all")
 public class DefaultJmxMetrics {
     private static final Tags tags = Tags.of("application", "venus").and("version", "1.0.0");

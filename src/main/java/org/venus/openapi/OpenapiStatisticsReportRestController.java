@@ -10,8 +10,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.venus.support.GenericRestApiResponse;
 import org.venus.support.VenusRestApiCode;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/openapi/statistics")
 @Slf4j

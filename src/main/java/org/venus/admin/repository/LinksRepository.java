@@ -1,14 +1,15 @@
 package org.venus.admin.repository;
 
-import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-import org.venus.admin.domain.LinksEntity;
 import org.venus.admin.domain.LinksDao;
+import org.venus.admin.domain.LinksEntity;
+
+import java.util.List;
 
 @Repository
 public interface LinksRepository extends JpaRepository<LinksEntity, Long> {
@@ -26,10 +27,10 @@ public interface LinksRepository extends JpaRepository<LinksEntity, Long> {
     @Modifying
     @Transactional
     @Query(value = "UPDATE links SET code = :#{#ld.code}, redirect = :#{#ld.redirect}, original_url = :#{#ld.originalUrl}, expires_at = :#{#ld.expiresAt}, is_active = :#{#ld.isActive} WHERE id = :#{#ld.id}", nativeQuery = true)
-    void update(@Param("ld")LinksDao ld);
+    void update(@Param("ld") LinksDao ld);
 
     @Modifying
     @Transactional
     @Query(value = "DELETE FROM links where id=:id", nativeQuery = true)
-    void remove(@Param("id")long id);
+    void remove(@Param("id") long id);
 }

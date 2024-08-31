@@ -13,10 +13,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 public class VenusMultiLevelCacheManager implements CacheManager, CacheSelector {
-   private final Map<String, Cache> caches = new ConcurrentHashMap<>();
-   private final VenusMultiLevelCacheProperties properties;
-   private final RedisTemplate<String, CacheWrapper> secondCache;
-   private final com.github.benmanes.caffeine.cache.Cache<String, CacheWrapper> primaryCache;
+    private final Map<String, Cache> caches = new ConcurrentHashMap<>();
+    private final VenusMultiLevelCacheProperties properties;
+    private final RedisTemplate<String, CacheWrapper> secondCache;
+    private final com.github.benmanes.caffeine.cache.Cache<String, CacheWrapper> primaryCache;
 
     public VenusMultiLevelCacheManager(VenusMultiLevelCacheProperties properties, RedisTemplate<String, CacheWrapper> secondCache) {
         this.properties = properties;
@@ -30,10 +30,10 @@ public class VenusMultiLevelCacheManager implements CacheManager, CacheSelector 
         if (cache != null) {
             return cache;
         }
-        return caches.computeIfAbsent(name, s -> new VenusMultiLevelValueAdaptingCache(name,secondCache, primaryCache, properties));
+        return caches.computeIfAbsent(name, s -> new VenusMultiLevelValueAdaptingCache(name, secondCache, primaryCache, properties));
     }
 
-    private com.github.benmanes.caffeine.cache.Cache<String, CacheWrapper> buildCaffeineCache(){
+    private com.github.benmanes.caffeine.cache.Cache<String, CacheWrapper> buildCaffeineCache() {
         Caffeine<Object, Object> caffeineBuilder = Caffeine.newBuilder();
         Optional<VenusMultiLevelCacheProperties> opt = Optional.ofNullable(this.properties);
         opt.map(VenusMultiLevelCacheProperties::getInitCapacity)
@@ -41,9 +41,9 @@ public class VenusMultiLevelCacheManager implements CacheManager, CacheSelector 
         opt.map(VenusMultiLevelCacheProperties::getMaxCapacity)
                 .ifPresent(caffeineBuilder::maximumSize);
         opt.map(VenusMultiLevelCacheProperties::getExpireAfterAccess)
-                .ifPresent(eaa->caffeineBuilder.expireAfterAccess(eaa,TimeUnit.MILLISECONDS));
+                .ifPresent(eaa -> caffeineBuilder.expireAfterAccess(eaa, TimeUnit.MILLISECONDS));
         opt.map(VenusMultiLevelCacheProperties::getExpireAfterWrite)
-                .ifPresent(eaa->caffeineBuilder.expireAfterWrite(eaa,TimeUnit.MILLISECONDS));
+                .ifPresent(eaa -> caffeineBuilder.expireAfterWrite(eaa, TimeUnit.MILLISECONDS));
         return caffeineBuilder.build();
     }
 
@@ -57,6 +57,7 @@ public class VenusMultiLevelCacheManager implements CacheManager, CacheSelector 
     public com.github.benmanes.caffeine.cache.Cache<String, CacheWrapper> primaryCache() {
         return this.primaryCache;
     }
+
     @SuppressWarnings("all")
     @Override
     public RedisTemplate<String, CacheWrapper> secondCache() {

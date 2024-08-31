@@ -6,5 +6,6 @@ import java.util.List;
 
 public interface IGeoService {
     List<GeoEntity> lists();
+
     GeoEntity detail(long id);
 }

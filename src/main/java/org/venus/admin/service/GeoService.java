@@ -5,7 +5,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.venus.admin.domain.GeoEntity;
 import org.venus.admin.repository.GeoRepository;
-import org.venus.admin.service.IGeoService;
 
 import java.util.List;
 

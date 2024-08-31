@@ -4,14 +4,11 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.hibernate.validator.constraints.Length;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.venus.admin.annotations.FutureDate;
 
 @Data
@@ -29,8 +26,8 @@ public class LinksRequest {
     private long id;
 
     /**
-     *  if {@code code} is not null, need to ensure its unique and its length must be 8, and it needs to conform to 62-bit encoded characters, eg:[0-9] [a-z] [A-Z]
-     *  if its null, it will create by venus system.
+     * if {@code code} is not null, need to ensure its unique and its length must be 8, and it needs to conform to 62-bit encoded characters, eg:[0-9] [a-z] [A-Z]
+     * if its null, it will create by venus system.
      */
     @Length(min = 0, max = 8, message = "The links code character length must be 8")
     private String code;

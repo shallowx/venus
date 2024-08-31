@@ -54,7 +54,7 @@ public class OpenapiEntity implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         OpenapiEntity entity = (OpenapiEntity) o;
-        return  redirect == entity.redirect
+        return redirect == entity.redirect
                 && isActive == entity.isActive
                 && Objects.equals(code, entity.code)
                 && Objects.equals(originalUrl, entity.originalUrl)

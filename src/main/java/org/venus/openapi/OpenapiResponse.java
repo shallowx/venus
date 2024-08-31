@@ -1,7 +1,6 @@
 package org.venus.openapi;
 
 import lombok.*;
-import org.venus.admin.domain.GeoResponse;
 
 import java.time.LocalDateTime;
 import java.util.Collections;

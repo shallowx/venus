@@ -43,15 +43,15 @@ public class LinksRestController {
 
     @GetMapping("/detail/{id}")
     public GenericRestApiResponse<LinksResponse> detail(@PathVariable @NotNull
-                                                            @Validated
-                                                            @NotNull
-                                                            @Min(0)
-                                                            @Max(Long.MAX_VALUE) long id) {
+                                                        @Validated
+                                                        @NotNull
+                                                        @Min(0)
+                                                        @Max(Long.MAX_VALUE) long id) {
         try {
             return GenericRestApiResponse.success(
-               LinksResponse.from(
-                       iLinksService.get(id)
-               )
+                    LinksResponse.from(
+                            iLinksService.get(id)
+                    )
             );
         } catch (Exception e) {
             if (log.isErrorEnabled()) {
@@ -67,7 +67,7 @@ public class LinksRestController {
             LinksDao ld = LinksDao.fromEntity(request);
             iLinksService.add(ld);
             return GenericRestApiResponse.success();
-        }catch (Exception e) {
+        } catch (Exception e) {
             if (log.isInfoEnabled()) {
                 log.error("Add Links failure", e);
             }
@@ -81,7 +81,7 @@ public class LinksRestController {
             LinksDao ld = LinksDao.fromEntity(request);
             iLinksService.update(ld);
             return GenericRestApiResponse.success();
-        }catch (Exception e) {
+        } catch (Exception e) {
             if (log.isInfoEnabled()) {
                 log.error("Update Links failure", e);
             }
@@ -91,14 +91,14 @@ public class LinksRestController {
 
     @DeleteMapping("/delete/{id}")
     public GenericRestApiResponse<Void> delete(@PathVariable
-                                                   @Validated
-                                                   @NotNull
-                                                   @Min(0)
-                                                   @Max(Long.MAX_VALUE) long id) {
+                                               @Validated
+                                               @NotNull
+                                               @Min(0)
+                                               @Max(Long.MAX_VALUE) long id) {
         try {
             iLinksService.delete(id);
             return GenericRestApiResponse.success();
-        }catch (Exception e) {
+        } catch (Exception e) {
             if (log.isErrorEnabled()) {
                 log.error("Delete links[id:{}] failure", id, e);
             }

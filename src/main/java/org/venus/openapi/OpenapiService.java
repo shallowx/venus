@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.Cache;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 import org.venus.cache.*;
 
 import java.io.Serial;
@@ -18,7 +17,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.venus.cache.VenusMultiLevelCacheConstants.*;
+import static org.venus.cache.VenusMultiLevelCacheConstants.REDIRECT_CACHE_NAME;
+import static org.venus.cache.VenusMultiLevelCacheConstants.VENUS_CACHE_CALLBACK_NAME;
 
 @Service
 @Slf4j
@@ -37,41 +37,41 @@ public class OpenapiService implements IOpenapiService, Callback {
 
     @PostConstruct
     public void init() {
-        CacheSelector selector = (VenusMultiLevelCacheManager)manager.getCache(REDIRECT_CACHE_NAME);
+        CacheSelector selector = (VenusMultiLevelCacheManager) manager.getCache(REDIRECT_CACHE_NAME);
         RedisTemplate<String, CacheWrapper> template = selector.secondCache();
-       try {
-           // It is only used when the service starts, because the distributed lock implementation is reasonable.
-           Boolean isLocked = template.opsForValue().setIfPresent("venus-initializer-distributed-lock", CacheWrapper.builder()
-                   .key("venus-initializer-distributed-lock")
-                   .value("venus-initializer-distributed-lock")
-                   .build(), Duration.ofMillis(5 * 60 * 1000L));
-           if (Boolean.FALSE.equals(isLocked)) {
-               if (log.isDebugEnabled()) {
-                   log.debug("Venus redis was initialized");
-               }
-               return;
-           }
-           List<OpenapiEntity> entities = openapiRepository.lists();
-           if (entities == null || entities.isEmpty()) {
-               if (log.isWarnEnabled()) {
-                   log.warn("Venus redis initialize from db is empty");
-               }
-               return;
-           }
+        try {
+            // It is only used when the service starts, because the distributed lock implementation is reasonable.
+            Boolean isLocked = template.opsForValue().setIfPresent("venus-initializer-distributed-lock", CacheWrapper.builder()
+                    .key("venus-initializer-distributed-lock")
+                    .value("venus-initializer-distributed-lock")
+                    .build(), Duration.ofMillis(5 * 60 * 1000L));
+            if (Boolean.FALSE.equals(isLocked)) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Venus redis was initialized");
+                }
+                return;
+            }
+            List<OpenapiEntity> entities = openapiRepository.lists();
+            if (entities == null || entities.isEmpty()) {
+                if (log.isWarnEnabled()) {
+                    log.warn("Venus redis initialize from db is empty");
+                }
+                return;
+            }
 
-           Cache cache = manager.getCache(REDIRECT_CACHE_NAME);
-           for (OpenapiEntity entity : entities) {
-               try {
-                   cache.put(entity.getCode(), CacheWrapper.builder().key(entity.getCode()).value(entity).build());
-               } catch (Exception e) {
-                   if (log.isErrorEnabled()) {
-                       log.error("Venus redis key[{}] initialize was failure with entity[{}]", entity.getCode(), entity, e);
-                   }
-               }
-           }
-       } finally {
-           template.delete("venus-initializer-distributed-lock");
-       }
+            Cache cache = manager.getCache(REDIRECT_CACHE_NAME);
+            for (OpenapiEntity entity : entities) {
+                try {
+                    cache.put(entity.getCode(), CacheWrapper.builder().key(entity.getCode()).value(entity).build());
+                } catch (Exception e) {
+                    if (log.isErrorEnabled()) {
+                        log.error("Venus redis key[{}] initialize was failure with entity[{}]", entity.getCode(), entity, e);
+                    }
+                }
+            }
+        } finally {
+            template.delete("venus-initializer-distributed-lock");
+        }
 
     }
 

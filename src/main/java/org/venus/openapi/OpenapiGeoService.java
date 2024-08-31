@@ -17,7 +17,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 @Service
 @Slf4j
-public class OpenapiGeoService implements IOpenapiGeoService{
+public class OpenapiGeoService implements IOpenapiGeoService {
     @Autowired
     private OpenapiGeoRepository openapiGeoRepository;
     @Autowired
@@ -48,7 +48,8 @@ public class OpenapiGeoService implements IOpenapiGeoService{
                 }
                 try {
                     TimeUnit.MILLISECONDS.sleep(geoReportProperties.getReportWithoutDataTimeout());
-                } catch (InterruptedException ignored) {}
+                } catch (InterruptedException ignored) {
+                }
             }
         }, geoReportProperties.getScheduledDelay(), geoReportProperties.getScheduledPeriod(), TimeUnit.MILLISECONDS);
     }
@@ -57,10 +58,11 @@ public class OpenapiGeoService implements IOpenapiGeoService{
         readWriteLock.writeLock();
         List<OpenapiGeoEntity> newEntities;
         try {
-            newEntities= new ArrayList<>(entities);
+            newEntities = new ArrayList<>(entities);
             entities.clear();
-        }finally {
-            readWriteLock.writeLock().unlock();;
+        } finally {
+            readWriteLock.writeLock().unlock();
+            ;
         }
         return newEntities;
     }

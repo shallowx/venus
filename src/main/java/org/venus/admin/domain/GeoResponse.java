@@ -1,6 +1,7 @@
 package org.venus.admin.domain;
 
 import lombok.*;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -32,8 +33,8 @@ public class GeoResponse {
         if (geos == null || geos.isEmpty()) {
             return Collections.emptyList();
         }
-       return geos.stream()
-               .map(GeoResponse::from)
-               .collect(Collectors.toList());
+        return geos.stream()
+                .map(GeoResponse::from)
+                .collect(Collectors.toList());
     }
 }
