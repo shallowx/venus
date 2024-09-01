@@ -1,5 +1,6 @@
 plugins {
     java
+    id("application")
     id("org.springframework.boot") version "3.3.3"
     id("io.spring.dependency-management") version "1.1.6"
     id("org.graalvm.buildtools.native") version "0.10.2"
@@ -7,6 +8,11 @@ plugins {
 
 group = "org.venus"
 version = "1.0.0-SNAPSHOT"
+
+application {
+    mainClass = "org.venus.VenusApplication"
+    applicationDefaultJvmArgs = listOf("-Dgreeting.language=en")
+}
 
 java {
     toolchain {
