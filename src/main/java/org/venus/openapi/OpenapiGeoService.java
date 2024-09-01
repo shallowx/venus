@@ -39,16 +39,20 @@ public class OpenapiGeoService implements IOpenapiGeoService {
         this.scheduledExecutorService = Executors.newSingleThreadScheduledExecutor(factory);
         this.scheduledExecutorService.scheduleAtFixedRate(() -> {
             while (true) {
-                int size = entities.size();
-                if (size > geoReportProperties.getReportSize() ||
-                        System.currentTimeMillis() - lastUpdatedTime > geoReportProperties.getReportTimeout()) {
-                    List<OpenapiGeoEntity> newEntities = readAndClear();
-                    lastUpdatedTime = System.currentTimeMillis();
-                    openapiGeoRepository.saveAll(newEntities);
-                }
                 try {
+                    int size = entities.size();
+                    if (size > geoReportProperties.getReportSize() ||
+                            System.currentTimeMillis() - lastUpdatedTime > geoReportProperties.getReportTimeout()) {
+                        List<OpenapiGeoEntity> newEntities = readAndClear();
+                        lastUpdatedTime = System.currentTimeMillis();
+                        openapiGeoRepository.saveAll(newEntities);
+                    }
+
                     TimeUnit.MILLISECONDS.sleep(geoReportProperties.getReportWithoutDataTimeout());
-                } catch (InterruptedException ignored) {
+                } catch (Exception e) {
+                    if (log.isErrorEnabled()) {
+                        log.error("Geo report failure", e);
+                    }
                 }
             }
         }, geoReportProperties.getScheduledDelay(), geoReportProperties.getScheduledPeriod(), TimeUnit.MILLISECONDS);
@@ -62,7 +66,6 @@ public class OpenapiGeoService implements IOpenapiGeoService {
             entities.clear();
         } finally {
             readWriteLock.writeLock().unlock();
-            ;
         }
         return newEntities;
     }

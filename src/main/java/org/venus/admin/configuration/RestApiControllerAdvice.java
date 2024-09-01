@@ -14,7 +14,7 @@ import org.springframework.web.servlet.HandlerMapping;
 import org.venus.admin.annotations.RestApiList;
 import org.venus.support.GenericListRestApiResponse;
 import org.venus.support.GenericRestApiResponse;
-import org.venus.support.VenusAdminException;
+import org.venus.support.VenusException;
 import org.venus.support.VenusRestApiCode;
 
 import java.util.Objects;
@@ -74,9 +74,9 @@ public class RestApiControllerAdvice {
     }
 
 
-    @ExceptionHandler(value = VenusAdminException.class)
+    @ExceptionHandler(value = VenusException.class)
     @ResponseBody
-    public Object venusAdminExceptionHandler(HttpServletRequest request, VenusAdminException e) {
+    public Object venusAdminExceptionHandler(HttpServletRequest request, VenusException e) {
         if (log.isErrorEnabled()) {
             log.error("path:{} - venus admin exception", request.getRequestURL(), e);
         }

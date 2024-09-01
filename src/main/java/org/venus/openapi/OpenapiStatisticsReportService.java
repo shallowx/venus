@@ -39,16 +39,20 @@ public class OpenapiStatisticsReportService implements IOpenapiStatisticsReportS
         this.scheduledExecutorService = Executors.newSingleThreadScheduledExecutor(factory);
         this.scheduledExecutorService.scheduleAtFixedRate(() -> {
             while (true) {
-                int size = entities.size();
-                if (size > statisticsReportProperties.getReportSize() ||
-                        System.currentTimeMillis() - lastUpdatedTime > statisticsReportProperties.getReportTimeout()) {
-                    List<OpenapiStatisticsEntity> newEntities = readAndClear();
-                    lastUpdatedTime = System.currentTimeMillis();
-                    openapiStatisticsRepository.saveAll(newEntities);
-                }
                 try {
+                    int size = entities.size();
+                    if (size > statisticsReportProperties.getReportSize() ||
+                            System.currentTimeMillis() - lastUpdatedTime > statisticsReportProperties.getReportTimeout()) {
+                        List<OpenapiStatisticsEntity> newEntities = readAndClear();
+                        lastUpdatedTime = System.currentTimeMillis();
+                        openapiStatisticsRepository.saveAll(newEntities);
+                    }
+
                     TimeUnit.MILLISECONDS.sleep(statisticsReportProperties.getReportWithoutDataTimeout());
-                } catch (InterruptedException ignored) {
+                } catch (Exception e) {
+                    if (log.isErrorEnabled()) {
+                        log.error("Statistics report failure", e);
+                    }
                 }
             }
         }, statisticsReportProperties.getScheduledDelay(), statisticsReportProperties.getScheduledPeriod(), TimeUnit.MILLISECONDS);
@@ -62,7 +66,6 @@ public class OpenapiStatisticsReportService implements IOpenapiStatisticsReportS
             entities.clear();
         } finally {
             readWriteLock.writeLock().unlock();
-            ;
         }
         return newEntities;
     }

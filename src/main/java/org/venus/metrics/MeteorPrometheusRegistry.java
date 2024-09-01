@@ -7,6 +7,7 @@ import io.micrometer.prometheusmetrics.PrometheusConfig;
 import io.micrometer.prometheusmetrics.PrometheusMeterRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.venus.support.VenusException;
 
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
@@ -48,15 +49,22 @@ public class MeteorPrometheusRegistry implements MetricsRegistrySetUp {
                     out.write(scrape.getBytes());
                 }
             });
-            new Thread(this.server::start).start();
+
+            Thread.ofVirtual().name("venus-prometheus-start-virtual").start(() -> {
+                try {
+                    this.server.start();
+                } catch (Exception e) {
+                    if (log.isErrorEnabled()) {
+                        log.error("Venus http server start failure", e);
+                    }
+                }
+            }).start();
+
             if (log.isInfoEnabled()) {
-                log.info("Venus prometheus http server is listening at socket address[{}], and scrape url[{}]", socketAddress, url);
+                log.info("Venus prometheus http server is listening at socket address[{}] and scrape url[{}]", socketAddress, url);
             }
         } catch (Throwable t) {
-            if (log.isErrorEnabled()) {
-                log.error("Venus start prometheus http server failed", t);
-            }
-            throw new RuntimeException(t);
+            throw new VenusException("Venus start prometheus http server failure", t);
         }
     }
 
