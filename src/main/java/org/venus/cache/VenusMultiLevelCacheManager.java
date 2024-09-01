@@ -12,11 +12,11 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
-public class VenusMultiLevelCacheManager implements CacheManager, CacheSelector {
+public class VenusMultiLevelCacheManager implements CacheManager {
     private final Map<String, Cache> caches = new ConcurrentHashMap<>();
     private final VenusMultiLevelCacheProperties properties;
     private final RedisTemplate<String, CacheWrapper> secondCache;
-    private final com.github.benmanes.caffeine.cache.Cache<String, CacheWrapper> primaryCache;
+    private final com.github.benmanes.caffeine.cache.Cache<String, Object> primaryCache;
 
     public VenusMultiLevelCacheManager(VenusMultiLevelCacheProperties properties, RedisTemplate<String, CacheWrapper> secondCache) {
         this.properties = properties;
@@ -33,7 +33,7 @@ public class VenusMultiLevelCacheManager implements CacheManager, CacheSelector 
         return caches.computeIfAbsent(name, s -> new VenusMultiLevelValueAdaptingCache(name, secondCache, primaryCache, properties));
     }
 
-    private com.github.benmanes.caffeine.cache.Cache<String, CacheWrapper> buildCaffeineCache() {
+    private com.github.benmanes.caffeine.cache.Cache<String, Object> buildCaffeineCache() {
         Caffeine<Object, Object> caffeineBuilder = Caffeine.newBuilder();
         Optional<VenusMultiLevelCacheProperties> opt = Optional.ofNullable(this.properties);
         opt.map(VenusMultiLevelCacheProperties::getInitCapacity)
@@ -51,16 +51,5 @@ public class VenusMultiLevelCacheManager implements CacheManager, CacheSelector 
     @Override
     public Collection<String> getCacheNames() {
         return caches.keySet();
-    }
-
-    @Override
-    public com.github.benmanes.caffeine.cache.Cache<String, CacheWrapper> primaryCache() {
-        return this.primaryCache;
-    }
-
-    @SuppressWarnings("all")
-    @Override
-    public RedisTemplate<String, CacheWrapper> secondCache() {
-        return this.secondCache();
     }
 }

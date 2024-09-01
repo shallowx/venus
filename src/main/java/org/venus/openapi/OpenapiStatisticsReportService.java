@@ -25,6 +25,8 @@ public class OpenapiStatisticsReportService implements IOpenapiStatisticsReportS
     private final List<OpenapiStatisticsEntity> entities = new LinkedList<>();
     private long lastUpdatedTime = System.currentTimeMillis();
     private final ReentrantReadWriteLock readWriteLock = new ReentrantReadWriteLock();
+    private final ReentrantReadWriteLock.WriteLock writeLock = readWriteLock.writeLock();
+    private final ReentrantReadWriteLock.ReadLock readLock = readWriteLock.readLock();
     private ScheduledExecutorService scheduledExecutorService;
 
     @Override
@@ -59,23 +61,23 @@ public class OpenapiStatisticsReportService implements IOpenapiStatisticsReportS
     }
 
     private List<OpenapiStatisticsEntity> readAndClear() {
-        readWriteLock.writeLock();
+        writeLock.lock();
         List<OpenapiStatisticsEntity> newEntities;
         try {
             newEntities = new ArrayList<>(entities);
             entities.clear();
         } finally {
-            readWriteLock.writeLock().unlock();
+            writeLock.unlock();
         }
         return newEntities;
     }
 
     private void write(OpenapiStatisticsEntity entity) {
-        readWriteLock.readLock();
+        readLock.lock();
         try {
             entities.addLast(entity);
         } finally {
-            readWriteLock.readLock().unlock();
+            readLock.unlock();
         }
     }
 

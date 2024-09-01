@@ -47,24 +47,23 @@ public class MultiLevelCacheAspect {
 
         VenusMultiLevelCache annotation = method.getAnnotation(VenusMultiLevelCache.class);
         String elResult = parse(annotation.key(), treeMap);
-        String realKey = annotation.cacheName() + ":" + elResult;
         Cache cache = manager.getCache(DEFAULT_LISTENER_NAME);
 
         if (annotation.type() == MultiLevelCacheType.PUT) {
             Object object = point.proceed();
-            cache.put(realKey, object);
-            callback.callback(realKey, object, "update");
+            cache.put(elResult, object);
+            callback.callback(elResult, object, "update");
             return object;
         }
 
         if (annotation.type() == MultiLevelCacheType.EVICT) {
-            cache.evict(realKey);
-            callback.callback(realKey, null, "evict");
+            cache.evict(elResult);
+            callback.callback(elResult, null, "evict");
             return point.proceed();
         }
 
         // MultiLevelCacheType: ALL
-        return cache.get(realKey, () -> {
+        return cache.get(elResult, () -> {
             try {
                 return point.proceed();
             } catch (Throwable e) {

@@ -58,7 +58,7 @@ public class MeteorPrometheusRegistry implements MetricsRegistrySetUp {
                         log.error("Venus http server start failure", e);
                     }
                 }
-            }).start();
+            });
 
             if (log.isInfoEnabled()) {
                 log.info("Venus prometheus http server is listening at socket address[{}] and scrape url[{}]", socketAddress, url);

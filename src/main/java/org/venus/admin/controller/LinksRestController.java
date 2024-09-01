@@ -71,6 +71,7 @@ public class LinksRestController {
             if (log.isInfoEnabled()) {
                 log.error("Add Links failure", e);
             }
+
             return GenericRestApiResponse.fail(VenusRestApiCode.VENUS_ADMIN_EXCEPTION, VenusRestApiCode.VENUS_ADMIN_EXCEPTION.message());
         }
     }

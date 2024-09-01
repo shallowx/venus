@@ -2,6 +2,7 @@ package org.venus.cache;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import lombok.extern.slf4j.Slf4j;
+import org.checkerframework.checker.units.qual.C;
 import org.springframework.cache.support.AbstractValueAdaptingCache;
 import org.springframework.data.redis.connection.DataType;
 import org.springframework.data.redis.core.Cursor;
@@ -20,13 +21,13 @@ import static org.venus.cache.VenusMultiLevelCacheConstants.DEFAULT_LISTENER_NAM
 
 
 @Slf4j
-public class VenusMultiLevelValueAdaptingCache extends AbstractValueAdaptingCache {
+public class VenusMultiLevelValueAdaptingCache extends AbstractValueAdaptingCache implements CacheSelector{
     private String cacheName;
     private RedisTemplate<String, CacheWrapper> secondCache;
-    private Cache<String, CacheWrapper> primaryCache;
+    private Cache<String, Object> primaryCache;
     private VenusMultiLevelCacheProperties properties;
 
-    public VenusMultiLevelValueAdaptingCache(String cacheName, RedisTemplate<String, CacheWrapper> template, Cache<String, CacheWrapper> primaryCache, VenusMultiLevelCacheProperties properties) {
+    public VenusMultiLevelValueAdaptingCache(String cacheName, RedisTemplate<String, CacheWrapper> template, Cache<String, Object> primaryCache, VenusMultiLevelCacheProperties properties) {
         super(properties.isAllowNull());
         this.cacheName = cacheName;
         this.secondCache = template;
@@ -40,7 +41,7 @@ public class VenusMultiLevelValueAdaptingCache extends AbstractValueAdaptingCach
 
     @Override
     protected Object lookup(@NonNull Object key) {
-        CacheWrapper wrapper = primaryCache.getIfPresent((String) key);
+        CacheWrapper wrapper = (CacheWrapper) primaryCache.getIfPresent((String) key);
         if (wrapper != null) {
             if (log.isDebugEnabled()) {
                 log.debug("Get data from primary cache");
@@ -105,7 +106,7 @@ public class VenusMultiLevelValueAdaptingCache extends AbstractValueAdaptingCach
             }
             return;
         }
-        primaryCache.put((String) key, CacheWrapper.builder().key((String) key).value(toStoreValue(value)).build());
+        primaryCache.put((String) key, CacheWrapper.builder().key((String) key).value(value).build());
 
         String redisKey = buildKey(key);
         Optional<Long> expireOpt = Optional.ofNullable(properties)
@@ -176,5 +177,15 @@ public class VenusMultiLevelValueAdaptingCache extends AbstractValueAdaptingCach
 
     private String buildKey(Object key) {
         return this.cacheName + ":" + key;
+    }
+
+    @Override
+    public Cache<String, Object> primaryCache() {
+        return primaryCache;
+    }
+
+    @Override
+    public RedisTemplate<String, CacheWrapper> secondCache() {
+        return secondCache;
     }
 }

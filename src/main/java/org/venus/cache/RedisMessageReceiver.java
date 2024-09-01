@@ -2,6 +2,7 @@ package org.venus.cache;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.support.AbstractValueAdaptingCache;
 import org.springframework.data.redis.core.RedisTemplate;
 
 import java.net.UnknownHostException;
@@ -33,8 +34,8 @@ public class RedisMessageReceiver {
             return;
         }
 
-        CacheSelector selector = (VenusMultiLevelCacheManager) manager.getCache(clm.getName());
-        Cache<String, CacheWrapper> primaryCache = selector.primaryCache();
+        CacheSelector selector = (VenusMultiLevelValueAdaptingCache) manager.getCache(clm.getName());
+        Cache<String, Object> primaryCache = selector.primaryCache();
         if (clm.getType() == CacheMessageListenerType.UPDATE) {
             primaryCache.put(clm.getKey(), CacheWrapper.builder()
                     .key(clm.getKey())
