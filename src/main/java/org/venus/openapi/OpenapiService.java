@@ -27,16 +27,26 @@ public class OpenapiService implements IOpenapiService, Callback {
     private final OpenapiRepository openapiRepository;
     private final VenusMultiLevelCacheManager manager;
     private final OpenapiCacheConsistentAlarm alarm;
+    private final OpenapiInitializerProperties properties;
 
     @Autowired
-    public OpenapiService(OpenapiRepository openapiRepository, VenusMultiLevelCacheManager manager, ObjectProvider<OpenapiCacheConsistentAlarm> provider) {
+    public OpenapiService(OpenapiRepository openapiRepository, VenusMultiLevelCacheManager manager, OpenapiInitializerProperties properties,
+                          ObjectProvider<OpenapiCacheConsistentAlarm> provider) {
         this.openapiRepository = openapiRepository;
         this.manager = manager;
+        this.properties = properties;
         this.alarm = provider.getIfAvailable();
     }
 
     @PostConstruct
     public void init() {
+        if (!properties.isInitialized()) {
+            if (log.isWarnEnabled()) {
+                log.warn("Venus redis initialize not need");
+            }
+            return;
+        }
+
         List<OpenapiEntity> entities = openapiRepository.lists();
         if (entities == null || entities.isEmpty()) {
             if (log.isWarnEnabled()) {
@@ -54,7 +64,7 @@ public class OpenapiService implements IOpenapiService, Callback {
                     log.error("Venus redis key[{}] initialize was failure with entity[{}]", entity.getCode(), entity, e);
                 }
             }
-            }
+        }
     }
 
     @VenusMultiLevelCache(cacheName = REDIRECT_CACHE_NAME, key = "#encode", type = MultiLevelCacheType.ALL)

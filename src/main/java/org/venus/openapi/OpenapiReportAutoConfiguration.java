@@ -4,6 +4,6 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Configuration;
 
 @Configuration(proxyBeanMethods = false)
-@EnableConfigurationProperties({OpenapiReportProperties.class})
+@EnableConfigurationProperties({OpenapiReportProperties.class,OpenapiInitializerProperties.class})
 public class OpenapiReportAutoConfiguration {
 }
