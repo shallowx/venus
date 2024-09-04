@@ -1,6 +1,7 @@
 package org.venus.openapi;
 
 import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.ObjectProvider;
@@ -12,9 +13,9 @@ import org.venus.cache.*;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static org.venus.cache.VenusMultiLevelCacheConstants.REDIRECT_CACHE_NAME;
@@ -28,13 +29,16 @@ public class OpenapiService implements IOpenapiService, Callback {
     private final VenusMultiLevelCacheManager manager;
     private final OpenapiCacheConsistentAlarm alarm;
     private final OpenapiInitializerProperties properties;
+    private final RedisTemplate<String, CacheWrapper> redisTemplate;
+    private static final String VENUS_INITIALIZER_KV = "venus-initializer-kv";
 
     @Autowired
     public OpenapiService(OpenapiRepository openapiRepository, VenusMultiLevelCacheManager manager, OpenapiInitializerProperties properties,
-                          ObjectProvider<OpenapiCacheConsistentAlarm> provider) {
+                          ObjectProvider<OpenapiCacheConsistentAlarm> provider, RedisTemplate<String, CacheWrapper> redisTemplate) {
         this.openapiRepository = openapiRepository;
         this.manager = manager;
         this.properties = properties;
+        this.redisTemplate = redisTemplate;
         this.alarm = provider.getIfAvailable();
     }
 
@@ -43,6 +47,19 @@ public class OpenapiService implements IOpenapiService, Callback {
         if (!properties.isInitialized()) {
             if (log.isWarnEnabled()) {
                 log.warn("Venus redis initialize not need");
+            }
+            return;
+        }
+
+        // Prevent restarts or expansions from causing the service to load initialization data multiple times
+        // And under normal circumstances, there is no need to set the expiration time for the key or delete the key
+        // If the pod starts abnormally, you can choose to manually delete and change the key, or accept the method of initializing the cache when accessing the key to initialize the data
+        Boolean isSuccess = redisTemplate.opsForValue().setIfAbsent(VENUS_INITIALIZER_KV, CacheWrapper.builder()
+                .key(VENUS_INITIALIZER_KV).value(VENUS_INITIALIZER_KV)
+                .build());
+        if (Boolean.FALSE.equals(isSuccess)) {
+            if (log.isInfoEnabled()) {
+                log.info("venus redirect initializer was successfully");
             }
             return;
         }

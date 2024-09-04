@@ -10,5 +10,5 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @Data
 @ConfigurationProperties(prefix = "spring.venus.openapi.initializer")
 public class OpenapiInitializerProperties {
-    private boolean isInitialized;
+    private boolean initialized;
 }
