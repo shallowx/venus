@@ -100,7 +100,8 @@ public class VenusMultiLevelValueAdaptingCache extends AbstractValueAdaptingCach
 
     @Override
     public void put(@NonNull Object key, Object value) {
-        if (!isAllowNullValues() && Objects.isNull(value)) {
+        // Allows storage of NULL values, which in some cases can avoid problems such as cache penetration
+        if (!isAllowNullValues() && value == null) {
             if (log.isWarnEnabled()) {
                 log.warn("The value NULL will not be cached");
             }
