@@ -106,15 +106,15 @@ public class VenusMultiLevelValueAdaptingCache extends AbstractValueAdaptingCach
             }
             return;
         }
-        primaryCache.put((String) key, CacheWrapper.builder().key((String) key).value(value).build());
+        primaryCache.put((String) key, new CacheWrapper((String) key, value));
 
         String redisKey = buildKey(key);
         Optional<Long> expireOpt = Optional.ofNullable(properties)
                 .map(VenusMultiLevelCacheProperties::getRedisExpires);
         if (expireOpt.isPresent()) {
-            secondCache.opsForValue().set(redisKey, CacheWrapper.builder().key(redisKey).value(value).build(), expireOpt.get(), TimeUnit.MILLISECONDS);
+            secondCache.opsForValue().set(redisKey, new CacheWrapper(redisKey, value), expireOpt.get(), TimeUnit.MILLISECONDS);
         } else {
-            secondCache.opsForValue().set(redisKey, CacheWrapper.builder().key(redisKey).value(value).build());
+            secondCache.opsForValue().set(redisKey, new CacheWrapper(redisKey, value));
         }
 
         try {

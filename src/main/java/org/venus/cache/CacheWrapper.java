@@ -7,16 +7,23 @@ import java.io.Serializable;
 import java.util.Objects;
 
 @Getter
-@AllArgsConstructor
-@NoArgsConstructor
 @Setter
-@Builder
 public class CacheWrapper implements Serializable {
     @Serial
     private static final long serialVersionUID = -3390119726919797623L;
 
     private String key;
     private Object value;
+    private int hash;
+
+    public CacheWrapper() {
+    }
+
+    public CacheWrapper(String key, Object value) {
+        this.key = key;
+        this.value = value;
+        this.hash = Objects.hash(key) + value.hashCode();
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -28,6 +35,6 @@ public class CacheWrapper implements Serializable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(key) + value.hashCode();
+        return hash;
     }
 }

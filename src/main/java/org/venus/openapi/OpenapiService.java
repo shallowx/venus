@@ -54,9 +54,7 @@ public class OpenapiService implements IOpenapiService, Callback {
         // Prevent restarts or expansions from causing the service to load initialization data multiple times
         // And under normal circumstances, there is no need to set the expiration time for the key or delete the key
         // If the pod starts abnormally, you can choose to manually delete and change the key, or accept the method of initializing the cache when accessing the key to initialize the data
-        Boolean isSuccess = redisTemplate.opsForValue().setIfAbsent(VENUS_INITIALIZER_KV, CacheWrapper.builder()
-                .key(VENUS_INITIALIZER_KV).value(VENUS_INITIALIZER_KV)
-                .build());
+        Boolean isSuccess = redisTemplate.opsForValue().setIfAbsent(VENUS_INITIALIZER_KV, new CacheWrapper(VENUS_INITIALIZER_KV, VENUS_INITIALIZER_KV));
         if (Boolean.FALSE.equals(isSuccess)) {
             if (log.isInfoEnabled()) {
                 log.info("venus redirect initializer was successfully");

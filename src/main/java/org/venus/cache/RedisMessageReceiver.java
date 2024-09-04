@@ -37,10 +37,7 @@ public class RedisMessageReceiver {
         CacheSelector selector = (VenusMultiLevelValueAdaptingCache) manager.getCache(clm.getName());
         Cache<String, Object> primaryCache = selector.primaryCache();
         if (clm.getType() == CacheMessageListenerType.UPDATE) {
-            primaryCache.put(clm.getKey(), CacheWrapper.builder()
-                    .key(clm.getKey())
-                    .value(clm.getValue())
-                    .build());
+            primaryCache.put(clm.getKey(), new CacheWrapper(clm.getKey(), clm.getValue()));
         }
 
         if (clm.getType() == CacheMessageListenerType.INVALIDATE) {
