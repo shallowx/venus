@@ -44,7 +44,7 @@ public class VenusMultiLevelValueAdaptingCache extends AbstractValueAdaptingCach
         CacheWrapper wrapper = (CacheWrapper) primaryCache.getIfPresent((String) key);
         if (wrapper != null) {
             if (log.isDebugEnabled()) {
-                log.debug("Get data from primary cache");
+                log.debug("Get data[key:{}, value-wrapper:{}] from primary cache", key, wrapper);
             }
             return wrapper;
         }
@@ -53,7 +53,7 @@ public class VenusMultiLevelValueAdaptingCache extends AbstractValueAdaptingCach
         wrapper = secondCache.opsForValue().get(redisKey);
         if (wrapper != null) {
             if (log.isDebugEnabled()) {
-                log.debug("Get data from second cache");
+                log.debug("Get data[key:{}, value-wrapper:{}] from second cache", key, wrapper);
             }
             primaryCache.put((String) key, wrapper);
         }
@@ -86,13 +86,16 @@ public class VenusMultiLevelValueAdaptingCache extends AbstractValueAdaptingCach
                 if (wrapper != null) {
                     return (T) wrapper.getValue();
                 } else {
+                    if (log.isDebugEnabled()) {
+                        log.debug("The key[{}]-value[{}] is not exists in the cache", key, t);
+                    }
                     put(key, t);
                 }
             }
             return t;
         } catch (Exception e) {
             if (log.isErrorEnabled()) {
-                log.error(e.getMessage(), e);
+                log.error("Get data[key:{}] from cache is failure", key, e);
             }
         }
         return null;
@@ -103,7 +106,7 @@ public class VenusMultiLevelValueAdaptingCache extends AbstractValueAdaptingCach
         // Allows storage of NULL values, which in some cases can avoid problems such as cache penetration
         if (!isAllowNullValues() && value == null) {
             if (log.isWarnEnabled()) {
-                log.warn("The value NULL will not be cached");
+                log.warn("The key[{}] of value NULL will not be cached", key);
             }
             return;
         }

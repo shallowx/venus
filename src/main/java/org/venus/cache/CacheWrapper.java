@@ -37,4 +37,12 @@ public class CacheWrapper implements Serializable {
     public int hashCode() {
         return hash;
     }
+
+    @Override
+    public String toString() {
+        return "{" +
+                "key='" + key + '\'' +
+                ", value=" + value +
+                '}';
+    }
 }

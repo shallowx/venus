@@ -8,7 +8,6 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 public class ListenerSourceSupport {
-
     private static Environment env;
 
     public static void initialize(Environment environment) {

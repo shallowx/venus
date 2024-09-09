@@ -10,6 +10,7 @@ import java.io.Serializable;
 @Builder
 @Setter
 @Getter
+@EqualsAndHashCode
 public class CacheListenerMessage implements Serializable {
 
     @Serial
@@ -20,4 +21,15 @@ public class CacheListenerMessage implements Serializable {
     private String key;
     private Object value;
     private String source;
+
+    @Override
+    public String toString() {
+        return "CacheListenerMessage{" +
+                "name='" + name + '\'' +
+                ", type=" + type +
+                ", key='" + key + '\'' +
+                ", value=" + value +
+                ", source='" + source + '\'' +
+                '}';
+    }
 }

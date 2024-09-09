@@ -29,7 +29,7 @@ public class RedisMessageReceiver {
 
         if (clm.getSource().equals(ListenerSourceSupport.getSourceAddress())) {
             if (log.isDebugEnabled()) {
-                log.debug("The own service sends messages without updating the cache.");
+                log.debug("The own service sends messages without updating the cache[key:{}].", clm.getKey());
             }
             return;
         }
