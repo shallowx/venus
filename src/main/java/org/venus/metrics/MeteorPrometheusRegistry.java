@@ -55,7 +55,7 @@ public class MeteorPrometheusRegistry implements MetricsRegistrySetUp {
                     this.server.start();
                 } catch (Exception e) {
                     if (log.isErrorEnabled()) {
-                        log.error("Venus http server start failure", e);
+                        log.error("Venus prometheus http server start failure", e);
                     }
                 }
             });
@@ -64,7 +64,7 @@ public class MeteorPrometheusRegistry implements MetricsRegistrySetUp {
                 log.info("Venus prometheus http server is listening at socket address[{}] and scrape url[{}]", socketAddress, url);
             }
         } catch (Throwable t) {
-            throw new VenusException("Venus start prometheus http server failure", t);
+            throw new VenusException("Venus prometheus start http server failure", t);
         }
     }
 

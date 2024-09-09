@@ -129,7 +129,6 @@ public class OpenapiService implements IOpenapiService, Callback {
 
     @Getter
     @Setter
-    @Data
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor

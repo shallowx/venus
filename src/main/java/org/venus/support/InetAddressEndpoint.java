@@ -1,5 +1,9 @@
 package org.venus.support;
 
+import lombok.extern.java.Log;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -9,6 +13,8 @@ import java.util.Enumeration;
 import java.util.Objects;
 
 public class InetAddressEndpoint {
+
+    private static final Logger logger = LoggerFactory.getLogger(InetAddressEndpoint.class);
     private static InetAddress cachedInetAddress = null;
     private static String hostName = null;
     private static long expires = 0;
@@ -46,7 +52,9 @@ public class InetAddressEndpoint {
                     try (BufferedReader br = new BufferedReader(new FileReader(f))) {
                         hostName = br.readLine();
                     } catch (IOException e) {
-                        System.err.println("Failed to read hostname: " + e.getMessage());
+                        if (logger.isErrorEnabled()) {
+                            logger.error("Read hostname is failure", e);
+                        }
                     }
                 }
 

@@ -1,12 +1,16 @@
 package org.venus.support;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.io.Serial;
 
 @Getter
 @Setter
+@ToString
+@EqualsAndHashCode(callSuper = false)
 @SuppressWarnings("rawtypes")
 public class GenericRestApiResponse<T> extends AbstractRestApiResponse {
     @Serial
