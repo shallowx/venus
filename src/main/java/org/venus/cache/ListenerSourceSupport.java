@@ -26,7 +26,7 @@ public class ListenerSourceSupport {
 
     public static String getSourceAddress() throws UnknownHostException {
         String host = InetAddress.getLocalHost().getHostAddress();
-        String port = env.getProperty("server.port", "9527");
+        String port = env.getProperty("server.port", "8029");
         return host + ":" + port;
     }
 }
