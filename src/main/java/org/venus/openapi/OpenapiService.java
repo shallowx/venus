@@ -1,7 +1,6 @@
 package org.venus.openapi;
 
 import jakarta.annotation.PostConstruct;
-import jakarta.annotation.PreDestroy;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.ObjectProvider;
@@ -15,7 +14,6 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static org.venus.cache.VenusMultiLevelCacheConstants.REDIRECT_CACHE_NAME;
@@ -101,7 +99,7 @@ public class OpenapiService implements IOpenapiService, Callback {
     public OpenapiEntity redirect(String encode) {
         OpenapiEntity entity = this.get(encode);
         if (entity == null
-                || entity.getIsActive() == 0
+                || OpenapiRedirectStatusEnum.UN_ACTIVE == OpenapiRedirectStatusEnum.of(entity.getIsActive())
                 || entity.getExpiresAt().isBefore(LocalDateTime.now())) {
             return null;
         }
