@@ -17,6 +17,7 @@ public class RedisMessageReceiver {
         this.manager = manager;
     }
 
+    @CacheMessageListener
     @SuppressWarnings("ConstantConditions")
     public void receive(String message) throws UnknownHostException {
         CacheListenerMessage clm = (CacheListenerMessage) redisTemplate.getValueSerializer().deserialize(message.getBytes());

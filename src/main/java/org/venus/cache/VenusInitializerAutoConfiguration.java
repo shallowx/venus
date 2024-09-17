@@ -10,5 +10,4 @@ public class VenusInitializerAutoConfiguration {
     public VenusInitializer venusInitializer(ApplicationContext context) {
         return new VenusInitializer(context);
     }
-
 }

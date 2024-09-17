@@ -40,7 +40,7 @@ public class CacheWrapper implements Serializable {
 
     @Override
     public String toString() {
-        return "{" +
+        return "CacheWrapper{" +
                 "key='" + key + '\'' +
                 ", value=" + value +
                 '}';

@@ -14,6 +14,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.core.Ordered;
+import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.PatternTopic;
@@ -22,6 +23,9 @@ import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
+import org.springframework.util.StringUtils;
+
+import java.lang.reflect.Method;
 
 import static org.venus.cache.VenusMultiLevelCacheConstants.DEFAULT_LISTENER_NAME;
 
@@ -84,7 +88,6 @@ public class VenusMultiLevelCacheAutoConfiguration {
 
     @Configuration(proxyBeanMethods = false)
     static class MessageListenerAutoConfiguration {
-
         @Bean
         public RedisMessageReceiver redisMessageReceiver(VenusMultiLevelCacheManager manager, RedisTemplate<String, CacheListenerMessage> template) {
             return new RedisMessageReceiver(template, manager);
@@ -92,7 +95,26 @@ public class VenusMultiLevelCacheAutoConfiguration {
 
         @Bean
         public MessageListenerAdapter adapter(RedisMessageReceiver receiver) {
-            return new MessageListenerAdapter(receiver, "receive");
+            Class<RedisMessageReceiver> clz = RedisMessageReceiver.class;
+            Method[] methods = clz.getDeclaredMethods();
+            Method defaultListenerMethod = null;
+            for (Method method : methods) {
+                CacheMessageListener annotation = AnnotationUtils.findAnnotation(method, CacheMessageListener.class);
+                if (annotation != null) {
+                    defaultListenerMethod = method;
+                    break;
+                }
+            }
+
+            if (defaultListenerMethod == null) {
+                return new MessageListenerAdapter();
+            }
+
+            String methodName = defaultListenerMethod.getName();
+            if (StringUtils.hasText(methodName)) {
+                return new MessageListenerAdapter(receiver, methodName);
+            }
+            return new MessageListenerAdapter();
         }
 
         @Bean

@@ -76,6 +76,15 @@ public class RestApiControllerAdvice {
         }
     }
 
+    @ResponseBody
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public Object handle(MethodArgumentNotValidException e) {
+        if (log.isErrorEnabled()) {
+            log.error("Method argument not valid exception", e);
+        }
+        return GenericRestApiResponse.fail(VenusRestApiCode.BAD_REQUEST, "Method argument not valid exception");
+    }
+
 
     @ExceptionHandler(value = VenusException.class)
     @ResponseBody
