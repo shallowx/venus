@@ -6,9 +6,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerMapping;
 import org.venus.admin.annotations.RestApiList;
@@ -27,7 +29,7 @@ import java.util.stream.Collectors;
  * types of exceptions that may occur during the processing of REST API requests.
  */
 @Slf4j
-@ControllerAdvice
+@RestControllerAdvice
 public class RestApiControllerAdvice {
     /**
      * Handles exceptions of type MethodArgumentNotValidException by extracting error details
@@ -39,7 +41,6 @@ public class RestApiControllerAdvice {
      *         whether the endpoint is annotated with RestApiList
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    @ResponseBody
     public Object handleValidationExceptions(MethodArgumentNotValidException ex, HttpServletRequest request) {
         String[] errors = new String[3];
         ex.getBindingResult().getAllErrors().forEach(error -> {
@@ -69,7 +70,6 @@ public class RestApiControllerAdvice {
      * @return a response entity containing the error message and appropriate status code
      */
     @ExceptionHandler(ConstraintViolationException.class)
-    @ResponseBody
     public Object handleConstraintValidationExceptions(ConstraintViolationException ex, HttpServletRequest request) {
         String errorMessage = ex.getConstraintViolations().stream()
                 .map(violation -> String.format("%s: %s", violation.getPropertyPath(), violation.getMessage()))
@@ -93,7 +93,6 @@ public class RestApiControllerAdvice {
      * @return an appropriate response object indicating a failure due to a bad request
      */
     @ExceptionHandler(HttpMessageNotReadableException.class)
-    @ResponseBody
     public Object handleHttpMessageNotReadable(HttpMessageNotReadableException ex, HttpServletRequest request) {
         if (log.isErrorEnabled()) {
             log.error("path:{} - not readable exception", request.getRequestURL(), ex);
@@ -113,9 +112,8 @@ public class RestApiControllerAdvice {
      * @param e the MethodArgumentNotValidException caught during the validation process
      * @return a GenericRestApiResponse indicating validation failure and a BAD_REQUEST status code
      */
-    @ResponseBody
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public Object handle(MethodArgumentNotValidException e) {
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public Object handle(MissingServletRequestParameterException e) {
         if (log.isErrorEnabled()) {
             log.error("Method argument not valid exception", e);
         }
@@ -132,7 +130,6 @@ public class RestApiControllerAdvice {
      *         or GenericRestApiResponse, based on the presence of RestApiList annotation on the handler method
      */
     @ExceptionHandler(value = VenusException.class)
-    @ResponseBody
     public Object venusExceptionHandler(HttpServletRequest request, VenusException e) {
         if (log.isErrorEnabled()) {
             log.error("path:{} - venus exception", request.getRequestURL(), e);
@@ -153,7 +150,6 @@ public class RestApiControllerAdvice {
      * @return an object representing a generic failure response
      */
     @ExceptionHandler(value = Exception.class)
-    @ResponseBody
     public Object exceptionHandler(HttpServletRequest request, Exception e) {
         if (log.isErrorEnabled()) {
             log.error("path:{} - bad request", request.getRequestURL(), e);
