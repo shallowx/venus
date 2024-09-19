@@ -12,14 +12,29 @@ import org.venus.support.GenericListRestApiResponse;
 import org.venus.support.GenericRestApiResponse;
 import org.venus.support.VenusRestApiCode;
 
+/**
+ * REST controller for handling statistics-related endpoints.
+ */
 @RestController
 @RequestMapping(value = "/statistics")
 @Slf4j
 public class StatisticsRestController {
 
+    /**
+     * Service for performing operations related to statistics.
+     *
+     * This service provides methods to retrieve statistics data
+     * for lists and specific details.
+     */
     @Autowired
     private IStatisticsService iStatisticsService;
 
+    /**
+     * Handles the HTTP GET request to retrieve a list of statistics.
+     *
+     * @return a response object containing a list of StatisticsResponse objects if successful,
+     *         or an error response if an exception occurs.
+     */
     @GetMapping("/lists")
     public GenericListRestApiResponse<StatisticsResponse> lists() {
         try {
@@ -34,6 +49,12 @@ public class StatisticsRestController {
         }
     }
 
+    /**
+     * Handles the GET request for retrieving the details of a specific statistic.
+     *
+     * @param id the unique identifier of the statistic to retrieve
+     * @return a {@link GenericRestApiResponse} containing the {@link StatisticsResponse} or an error message in case of failure
+     */
     @GetMapping("/detail/{id}")
     public GenericRestApiResponse<StatisticsResponse> detail(@PathVariable long id) {
         try {

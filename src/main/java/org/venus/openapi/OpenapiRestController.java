@@ -23,27 +23,78 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+/**
+ * OpenapiRestController is a REST controller that handles API requests related to
+ * OpenAPI redirections and mappings. It provides endpoints for retrieving and
+ * redirecting URLs while also tracking request and redirect metrics.
+ */
 @RestController
 @RequestMapping("/openapi")
 @Slf4j
 public class OpenapiRestController {
 
+    /**
+     * This variable represents an autowired instance of IOpenapiService.
+     * The IOpenapiService interface is expected to provide methods to
+     * interact with an OpenAPI service, which typically offers endpoints
+     * to access various functionalities.
+     *
+     * The autowiring mechanism ensures that an appropriate implementation
+     * of this service is injected at runtime, facilitating dependency
+     * management and promoting loose coupling within the application.
+     */
     @Autowired
     private IOpenapiService iOpenapiService;
+    /**
+     * A constant representing the HTTP status code for a temporary redirect.
+     * The value "302" indicates that the requested resource resides temporarily
+     * under a different URI and the user agent should perform a temporary redirect.
+     */
     private static final String REDIRECT_302 = "302";
+    /**
+     * A constant representing the HTTP status code for "Moved Permanently".
+     * This status code indicates that the requested resource has been
+     * permanently moved to a new URL.
+     */
     private static final String REDIRECT_301 = "301";
 
+    /**
+     * A static and final instance of {@code MeterRegistry} that is initialized with
+     * the global registry from the Metrics library. This registry is used to collect
+     * and manage various metrics across the application.
+     */
     private static final MeterRegistry registry = Metrics.globalRegistry;
+    /**
+     * A thread-safe map that holds URL redirects.
+     *
+     * This variable uses a {@link ConcurrentHashMap} where the key represents the
+     * original URL string, and the value is a {@link Counter} object keeping track
+     * of the number of times the redirect has occurred. The use of
+     * {@link ConcurrentHashMap} ensures that the map can be safely accessed and
+     * modified by multiple threads concurrently.
+     */
     private static final ConcurrentHashMap<String, Counter> redirects = new ConcurrentHashMap<>();
+    /**
+     * A thread-safe map that keeps track of request counts for different keys.
+     * The keys are of type String, representing a specific request identifier.
+     * The values are Counter objects, which hold the count associated with each request.
+     * Utilizes ConcurrentHashMap to ensure thread safety when multiple threads
+     * update the request counts concurrently.
+     */
     private final ConcurrentHashMap<String, Counter> requestCounter = new ConcurrentHashMap<>();
+    /**
+     * A static final instance of ExecutorService that uses a virtual thread-per-task executor.
+     * This executor service is designed to efficiently handle a large number of concurrently executing tasks.
+     * Virtual threads are lightweight and managed by the Java runtime, making them suitable for high-concurrency applications.
+     */
     private static final ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
 
     /**
-     * If redirection through this system is not required, this api is suitable. And redirected by the caller
-     * However, if the caller does not report the analysis data, the data may be lost.
-     * <p>
-     * If the caller needs to cache the response, and it needs to register a callback method to update the new data from venus.
-     * Register method see 'admin(package)' function
+     * Handles a GET request to fetch an OpenAPI mapping entity based on the provided original URL.
+     *
+     * @param original the original URL to be encoded and mapped.
+     * @return a GenericRestApiResponse containing the OpenapiResponse if the mapping is successful,
+     *         or an error response if any exception occurs.
      */
     @GetMapping("/mapping")
     public GenericRestApiResponse<OpenapiResponse> get(@RequestParam String original) {
@@ -60,11 +111,10 @@ public class OpenapiRestController {
     }
 
     /**
-     * If redirection through this system is not required, this api is suitable. And redirected by the caller
-     * However, if the caller does not report the analysis data, the data may be lost.
-     * <p>
-     * If the caller needs to cache the response, and it needs to register a callback method to update the new data from venus.
-     * Register method see 'admin(package)' function
+     * Handles GET requests to retrieve a list of OpenAPI responses.
+     *
+     * @return {@code GenericListRestApiResponse<OpenapiResponse>} containing the list of OpenAPI responses if successful,
+     * or an error response otherwise.
      */
     @GetMapping("/lists")
     public GenericListRestApiResponse<OpenapiResponse> lists() {
@@ -81,7 +131,10 @@ public class OpenapiRestController {
     }
 
     /**
-     * If redirection through this system is required and need to record the redirect result
+     * Redirects the request based on the encoded parameter provided.
+     *
+     * @param encode the encoded string used to determine the redirect URL; should not be empty and must be valid.
+     * @return a ResponseEntity with an appropriate status and location headers based on the redirect information retrieved.
      */
     @GetMapping("/redirect")
     public ResponseEntity<Void> redirect(@RequestParam @NotEmpty @Validated String encode) {
@@ -110,6 +163,9 @@ public class OpenapiRestController {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
 
+    /**
+     *
+     */
     private void submit(String encode, String name, String url) {
         executor.submit(() -> {
             getRedirectCounterAndIncrement(encode, name, url);
@@ -117,6 +173,12 @@ public class OpenapiRestController {
         });
     }
 
+    /**
+     * Retrieves the HTTP request counter associated with the specified key and increments it.
+     * If the counter does not exist, it initializes a new counter and registers it.
+     *
+     * @param key the unique identifier for the HTTP request counter
+     */
     public void getHttpRequestCounterAndIncrement(String key) {
         Counter counter = requestCounter.get(key);
         if (counter == null) {
@@ -129,6 +191,15 @@ public class OpenapiRestController {
         counter.increment();
     }
 
+    /**
+     * This method retrieves a redirect counter associated with a given key from a map. If the counter does not exist,
+     * it creates a new counter using the given key, name, and original value, associates it with the key,
+     * and then increments the counter.
+     *
+     * @param key The key used to retrieve and associate the counter from the map.
+     * @param name The name used for creating a new counter if it does not already exist.
+     * @param original The original value to be tagged along with the counter if it needs to be created.
+     */
     private void getRedirectCounterAndIncrement(String key, String name, String original) {
         Counter counter = redirects.get(key);
         if (counter == null) {

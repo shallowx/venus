@@ -29,6 +29,10 @@ import java.lang.reflect.Method;
 
 import static org.venus.cache.VenusMultiLevelCacheConstants.DEFAULT_LISTENER_NAME;
 
+/**
+ * Auto-configuration class for Venus Multi-Level Cache.
+ * This class sets up the necessary beans and configurations to enable and manage a multi-level caching system that integrates local and remote cache layers.
+ */
 @AutoConfigureOrder(Ordered.LOWEST_PRECEDENCE)
 @Configuration(proxyBeanMethods = false)
 @EnableConfigurationProperties(VenusMultiLevelCacheProperties.class)
@@ -79,6 +83,13 @@ public class VenusMultiLevelCacheAutoConfiguration {
         }
     }
 
+    /**
+     * Creates and configures a VenusMultiLevelCacheManager bean.
+     *
+     * @param template the RedisTemplate used for operations on the remote cache
+     * @param properties the properties used to configure the multi-level caching system
+     * @return an instance of VenusMultiLevelCacheManager configured with the specified properties and template
+     */
     @ConditionalOnBean(VenusInitializer.class)
     @DependsOn("venusInitializer")
     @Bean
@@ -93,6 +104,14 @@ public class VenusMultiLevelCacheAutoConfiguration {
             return new RedisMessageReceiver(template, manager);
         }
 
+        /**
+         * Creates a MessageListenerAdapter to handle Redis messages for cache synchronization.
+         * The adapter is configured to use a specific method in the RedisMessageReceiver class annotated
+         * with @CacheMessageListener for handling incoming messages.
+         *
+         * @param receiver The RedisMessageReceiver instance that contains the method for handling messages.
+         * @return A configured MessageListenerAdapter based on the annotated method in the RedisMessageReceiver.
+         */
         @Bean
         public MessageListenerAdapter adapter(RedisMessageReceiver receiver) {
             Class<RedisMessageReceiver> clz = RedisMessageReceiver.class;
@@ -117,6 +136,13 @@ public class VenusMultiLevelCacheAutoConfiguration {
             return new MessageListenerAdapter();
         }
 
+        /**
+         * Creates and configures a RedisMessageListenerContainer bean.
+         *
+         * @param listenerAdapter the MessageListenerAdapter used for listening to Redis messages
+         * @param redisConnectionFactory the RedisConnectionFactory used to establish connections to the Redis server
+         * @return a configured instance of RedisMessageListenerContainer
+         */
         @Bean
         public RedisMessageListenerContainer container(MessageListenerAdapter listenerAdapter,
                                                        RedisConnectionFactory redisConnectionFactory) {
@@ -127,6 +153,13 @@ public class VenusMultiLevelCacheAutoConfiguration {
         }
     }
 
+    /**
+     * Creates a new instance of MultiLevelCacheAspect.
+     *
+     * @param manager The VenusMultiLevelCacheManager responsible for handling multi-level cache operations.
+     * @param callback The Callback instance used to handle multi-level cache events such as updates or evictions.
+     * @return A new MultiLevelCacheAspect instance configured with the specified manager and callback.
+     */
     @Bean
     public MultiLevelCacheAspect multiLevelCacheAspect(VenusMultiLevelCacheManager manager, @Autowired Callback callback) {
         return new MultiLevelCacheAspect(manager, callback);

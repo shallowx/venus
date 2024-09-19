@@ -12,14 +12,31 @@ import org.venus.support.GenericListRestApiResponse;
 import org.venus.support.GenericRestApiResponse;
 import org.venus.support.VenusRestApiCode;
 
+/**
+ * REST controller for handling geographical data.
+ */
 @RestController
 @RequestMapping("/geo")
 @Slf4j
 public class GeoRestController {
 
+    /**
+     * Service interface for handling geographical data operations.
+     *
+     * This interface provides methods to retrieve lists of geographical entities
+     * and to get detailed information about a specific geographical entity.
+     *
+     * <p>Injected into controller classes to delegate requests related to
+     * geographical data.
+     */
     @Autowired
     private IGeoService iGeoService;
 
+    /**
+     * Retrieves a list of geographical data entries.
+     *
+     * @return a response containing the list of geographical data entries or an error response if an exception occurs
+     */
     @GetMapping("/lists")
     public GenericListRestApiResponse<GeoResponse> lists() {
         try {
@@ -34,6 +51,13 @@ public class GeoRestController {
         }
     }
 
+    /**
+     * Retrieves the details of a geographical entity by its ID.
+     *
+     * @param id the ID of the geographical entity to retrieve
+     * @return a GenericRestApiResponse containing the details of the geographical entity.
+     *         If an error occurs, returns a failure response with an appropriate error code and message.
+     */
     @GetMapping("/detail/{id}")
     public GenericRestApiResponse<GeoResponse> detail(@PathVariable long id) {
         try {

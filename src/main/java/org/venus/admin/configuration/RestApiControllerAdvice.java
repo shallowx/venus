@@ -20,9 +20,24 @@ import org.venus.support.VenusRestApiCode;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+/**
+ * This class serves as a centralized exception handler for REST API controllers.
+ * It uses Spring's {@link ControllerAdvice} to provide global exception handling
+ * across all controllers in the application. It defines methods to handle various
+ * types of exceptions that may occur during the processing of REST API requests.
+ */
 @Slf4j
 @ControllerAdvice
 public class RestApiControllerAdvice {
+    /**
+     * Handles exceptions of type MethodArgumentNotValidException by extracting error details
+     * and returning an appropriate error response based on the invoked handler method.
+     *
+     * @param ex the MethodArgumentNotValidException thrown during validation failure
+     * @param request the HttpServletRequest associated with the validation failure
+     * @return a response object encapsulating the error details, formatted based on
+     *         whether the endpoint is annotated with RestApiList
+     */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseBody
     public Object handleValidationExceptions(MethodArgumentNotValidException ex, HttpServletRequest request) {
@@ -44,6 +59,15 @@ public class RestApiControllerAdvice {
         }
     }
 
+    /**
+     * Handles exceptions of type ConstraintViolationException, typically resulting from validation errors.
+     * This method extracts all validation error messages and consolidates them into a single error message.
+     * It also logs the error along with the request URL.
+     *
+     * @param ex the ConstraintViolationException that was thrown
+     * @param request the HttpServletRequest during which the exception was thrown
+     * @return a response entity containing the error message and appropriate status code
+     */
     @ExceptionHandler(ConstraintViolationException.class)
     @ResponseBody
     public Object handleConstraintValidationExceptions(ConstraintViolationException ex, HttpServletRequest request) {
@@ -61,6 +85,13 @@ public class RestApiControllerAdvice {
         }
     }
 
+    /**
+     * Exception handler method for handling cases where an HTTP message is not readable.
+     *
+     * @param ex the HttpMessageNotReadableException thrown when the HTTP message cannot be read
+     * @param request the HttpServletRequest object representing the client request
+     * @return an appropriate response object indicating a failure due to a bad request
+     */
     @ExceptionHandler(HttpMessageNotReadableException.class)
     @ResponseBody
     public Object handleHttpMessageNotReadable(HttpMessageNotReadableException ex, HttpServletRequest request) {
@@ -76,6 +107,12 @@ public class RestApiControllerAdvice {
         }
     }
 
+    /**
+     * Handles MethodArgumentNotValidException thrown during validation failure.
+     *
+     * @param e the MethodArgumentNotValidException caught during the validation process
+     * @return a GenericRestApiResponse indicating validation failure and a BAD_REQUEST status code
+     */
     @ResponseBody
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public Object handle(MethodArgumentNotValidException e) {
@@ -86,6 +123,14 @@ public class RestApiControllerAdvice {
     }
 
 
+    /**
+     * Handles exceptions of type VenusException.
+     *
+     * @param request the HttpServletRequest object containing client request details
+     * @param e the VenusException object caught by the handler
+     * @return a structured response indicating the failure, formatted as either GenericListRestApiResponse
+     *         or GenericRestApiResponse, based on the presence of RestApiList annotation on the handler method
+     */
     @ExceptionHandler(value = VenusException.class)
     @ResponseBody
     public Object venusExceptionHandler(HttpServletRequest request, VenusException e) {
@@ -100,6 +145,13 @@ public class RestApiControllerAdvice {
         }
     }
 
+    /**
+     * Handles exceptions thrown during the handling of web requests.
+     *
+     * @param request the HttpServletRequest that resulted in the exception
+     * @param e the exception that was thrown
+     * @return an object representing a generic failure response
+     */
     @ExceptionHandler(value = Exception.class)
     @ResponseBody
     public Object exceptionHandler(HttpServletRequest request, Exception e) {

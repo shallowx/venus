@@ -16,20 +16,73 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.venus.cache.VenusMultiLevelCacheConstants.REDIRECT_CACHE_NAME;
+import static org.venus.cache.VenusMultiLevelCacheConstants.VENUS_REDIRECT_CACHE_NAME;
 import static org.venus.cache.VenusMultiLevelCacheConstants.VENUS_CACHE_CALLBACK_NAME;
 
+/**
+ * OpenapiService is responsible for managing OpenAPI specifications,
+ * including interacting with the database and caching layers,
+ * initializing OpenAPI configuration, and handling cache consistency alarms.
+ */
 @Service
 @Slf4j
 public class OpenapiService implements IOpenapiService, Callback {
 
+    /**
+     * A private final instance of the OpenapiRepository class.
+     *
+     * This variable is used to interact with the repository layer,
+     * providing access to methods for handling OpenAPI specification data.
+     * It is marked as final to ensure that the reference cannot be reassigned
+     * after initialization.
+     */
     private final OpenapiRepository openapiRepository;
+    /**
+     * The `manager` variable is an instance of the `VenusMultiLevelCacheManager` class.
+     * It is responsible for managing a multi-level cache system within the application.
+     * This variable is declared as `private` and `final`,
+     * indicating that it can only be accessed within the enclosing class
+     * and that its reference cannot be changed once initialized.
+     */
     private final VenusMultiLevelCacheManager manager;
+    /**
+     * Represents an instance of the OpenapiCacheConsistentAlarm.
+     * This variable is used to manage and initiate alarms related to cache consistency in the OpenAPI.
+     * It is declared as final, meaning its reference cannot be changed once assigned.
+     * The alarm instance is intended to help maintain the integrity and accuracy of cached data.
+     */
     private final OpenapiCacheConsistentAlarm alarm;
+    /**
+     * The `properties` variable holds configuration properties for initializing
+     * the OpenAPI documentation. It is an instance of `OpenapiInitializerProperties`
+     * which contains all necessary settings required for setting up the OpenAPI
+     * specification.
+     */
     private final OpenapiInitializerProperties properties;
+    /**
+     * RedisTemplate bean for interacting with Redis datastore.
+     * Uses String as the key type and CacheWrapper as the value type.
+     * Provides operations for performing various Redis commands and transactions.
+     * Ensures thread safety and efficiency in accessing Redis data.
+     * Can be configured with custom serializers and connection factories.
+     */
     private final RedisTemplate<String, CacheWrapper> redisTemplate;
+    /**
+     * A constant string representing the key-value pair initializer for Venus-related configurations.
+     * This is used to specify the initialization parameters that are particular to the Venus component
+     * within the system.
+     */
     private static final String VENUS_INITIALIZER_KV = "venus-initializer-kv";
 
+    /**
+     * Constructs an OpenapiService with specified dependencies.
+     *
+     * @param openapiRepository the repository to manage OpenAPI entities
+     * @param manager the multi-level cache manager
+     * @param properties the properties for OpenAPI initialization
+     * @param provider the object provider for cache consistent alarm
+     * @param redisTemplate the Redis template for cache operations
+     */
     @Autowired
     public OpenapiService(OpenapiRepository openapiRepository, VenusMultiLevelCacheManager manager, OpenapiInitializerProperties properties,
                           ObjectProvider<OpenapiCacheConsistentAlarm> provider, RedisTemplate<String, CacheWrapper> redisTemplate) {
@@ -68,7 +121,7 @@ public class OpenapiService implements IOpenapiService, Callback {
             return;
         }
 
-        Cache cache = manager.getCache(REDIRECT_CACHE_NAME);
+        Cache cache = manager.getCache(VENUS_REDIRECT_CACHE_NAME);
         for (OpenapiEntity entity : entities) {
             try {
                 cache.put(entity.getCode(), entity);
@@ -80,13 +133,26 @@ public class OpenapiService implements IOpenapiService, Callback {
         }
     }
 
-    @VenusMultiLevelCache(cacheName = REDIRECT_CACHE_NAME, key = "#encode", type = MultiLevelCacheType.ALL)
+    /**
+     * Retrieves an OpenapiEntity from the repository based on the provided encode key.
+     *
+     * @param encode a String representing the key used to fetch the desired OpenapiEntity.
+     * @return the OpenapiEntity associated with the provided encode key.
+     */
+    @VenusMultiLevelCache(cacheName = VENUS_REDIRECT_CACHE_NAME, key = "#encode", type = MultiLevelCacheType.ALL)
     @Override
     public OpenapiEntity get(String encode) {
         return openapiRepository.get(encode);
     }
 
 
+    /**
+     * Retrieves a list of OpenapiEntity objects that are active and have not expired.
+     * The method filters the entities based on their 'isActive' status being non-zero
+     * and their 'expiresAt' timestamp being after the current date and time.
+     *
+     * @return a list of active and non-expired OpenapiEntity objects
+     */
     @Override
     public List<OpenapiEntity> lists() {
         return openapiRepository.lists().stream()
@@ -94,7 +160,13 @@ public class OpenapiService implements IOpenapiService, Callback {
                 .collect(Collectors.toList());
     }
 
-    @VenusMultiLevelCache(cacheName = REDIRECT_CACHE_NAME, key = "#encode", type = MultiLevelCacheType.ALL)
+    /**
+     * Redirects to an OpenapiEntity based on the given encode parameter.
+     *
+     * @param encode the encoded string used to lookup the OpenapiEntity.
+     * @return the OpenapiEntity if found and is active and not expired, otherwise null.
+     */
+    @VenusMultiLevelCache(cacheName = VENUS_REDIRECT_CACHE_NAME, key = "#encode", type = MultiLevelCacheType.ALL)
     @Override
     public OpenapiEntity redirect(String encode) {
         OpenapiEntity entity = this.get(encode);
@@ -107,15 +179,17 @@ public class OpenapiService implements IOpenapiService, Callback {
     }
 
     /**
-     * If the caller needs to cache the response, and it needs to register a callback method to update the new data from venus.
-     * Register method see 'admin(package)' function. when venus cache was updated, then the method will call back that register api
-     * to notify caller to update redirect url, e.g.
+     * Handles the callback for updating the Venus cache with the given parameters.
+     *
+     * @param key The key associated with the cache entry.
+     * @param o The object to be cached.
+     * @param type The type of the cache entry.
      */
     @Override
     public void callback(String key, Object o, String type) {
         CallbackRequestEntity entity = CallbackRequestEntity.builder().key(key).o(o).type(type).build();
         try {
-            CacheSelector selector = (VenusMultiLevelValueAdaptingCache) manager.getCache(REDIRECT_CACHE_NAME);
+            CacheSelector selector = (VenusMultiLevelValueAdaptingCache) manager.getCache(VENUS_REDIRECT_CACHE_NAME);
             selector.secondCache().convertAndSend(VENUS_CACHE_CALLBACK_NAME, entity);
         } catch (Exception e) {
             if (log.isErrorEnabled()) {
@@ -132,10 +206,23 @@ public class OpenapiService implements IOpenapiService, Callback {
     @AllArgsConstructor
     @EqualsAndHashCode
     static class CallbackRequestEntity implements Serializable {
+        /**
+         * Serial version UID for ensuring compatibility during serialization and deserialization.
+         */
         @Serial
         private static final long serialVersionUID = 2717227104050710204L;
+        /**
+         * Represents a unique identifier for the callback request.
+         */
         private String key;
+        /**
+         * An arbitrary object associated with the callback request.
+         * This may hold any data type or additional information needed for handling the request.
+         */
         private Object o;
+        /**
+         * The type of callback request, indicating whether it is an "update" or "evict" operation.
+         */
         private String type; // update or evict
     }
 }
