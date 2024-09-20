@@ -4,6 +4,8 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+import java.time.Duration;
+
 /**
  * Configuration properties for setting up Prometheus metrics in a Spring application.
  *
@@ -37,4 +39,21 @@ public class MetricsProperties {
      * The port number on which the Prometheus metrics are exposed.
      */
     private int port = 9090;
+    /**
+     * The duration period for collecting cache metrics.
+     *
+     * This variable defines how frequently the cache metrics should be gathered.
+     * It is represented as a Duration object, which provides utilities
+     * for managing time-based values.
+     */
+    private Duration cacheMetricsPeriod;
+
+    /**
+     * Indicates whether cache metrics collection is enabled.
+     *
+     * This flag determines if cache-related metrics should be collected
+     * and reported to Prometheus.
+     * By default, it is set to true, enabling the collection of cache metrics.
+     */
+    private boolean cacheMetricsEnabled = true;
 }

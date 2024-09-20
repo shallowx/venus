@@ -89,7 +89,7 @@ public class VenusMultiLevelCacheManager implements CacheManager {
                 .ifPresent(eaa -> caffeineBuilder.expireAfterAccess(eaa, TimeUnit.MILLISECONDS));
         opt.map(VenusMultiLevelCacheProperties::getExpireAfterWrite)
                 .ifPresent(eaa -> caffeineBuilder.expireAfterWrite(eaa, TimeUnit.MILLISECONDS));
-        return caffeineBuilder.build();
+        return caffeineBuilder.recordStats().build();
     }
 
     /**

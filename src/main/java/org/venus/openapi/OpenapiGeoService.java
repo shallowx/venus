@@ -136,6 +136,9 @@ public class OpenapiGeoService implements IOpenapiGeoService {
                     if (size > geoReportProperties.getReportSize() ||
                             System.currentTimeMillis() - lastUpdatedTime > geoReportProperties.getReportTimeout()) {
                         List<OpenapiGeoEntity> newEntities = readAndClear();
+                        if (newEntities == null || newEntities.isEmpty()) {
+                            continue;
+                        }
                         lastUpdatedTime = System.currentTimeMillis();
                         openapiGeoRepository.saveAll(newEntities);
                     }

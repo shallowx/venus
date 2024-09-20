@@ -31,10 +31,28 @@ import io.micrometer.core.instrument.binder.system.UptimeMetrics;
  * - ProcessorMetrics: Captures processor information and usage.
  */
 @SuppressWarnings("all")
-public class DefaultJmxMetrics {
+public class JmxMetrics {
     private static final Tags tags = Tags.of("application", "venus").and("version", "1.0.0");
 
-    public DefaultJmxMetrics() {
+    /**
+     * Initializes and registers various JVM-related metrics to the global MeterRegistry.
+     *
+     * This constructor sets up the following metrics using the Micrometer library:
+     *
+     * - UptimeMetrics: Tracks the application's uptime.
+     * - FileDescriptorMetrics: Monitors file descriptor usage.
+     * - ClassLoaderMetrics: Provides insights into class loading operations.
+     * - JvmMemoryMetrics: Captures JVM memory usage statistics.
+     * - JvmGcMetrics: Records garbage collection statistics.
+     * - JvmCompilationMetrics: Tracks JVM compilation activity.
+     * - JvmInfoMetrics: Provides basic JVM information.
+     * - JvmThreadMetrics: Provides statistics on JVM threads.
+     * - ProcessorMetrics: Captures processor information and usage.
+     *
+     * These metrics are tagged with application name and version for easier identification
+     * and filtering, and are bound to the global MeterRegistry.
+     */
+    public JmxMetrics() {
         MeterRegistry registry = Metrics.globalRegistry;
         new UptimeMetrics(tags).bindTo(registry);
         new FileDescriptorMetrics(tags).bindTo(registry);

@@ -1,10 +1,15 @@
 package org.venus.metrics;
 
+import com.github.benmanes.caffeine.cache.Cache;
 import io.micrometer.core.instrument.MeterRegistry;
+import org.springframework.boot.autoconfigure.AutoConfigureAfter;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.DependsOn;
+import org.venus.cache.*;
 
 /**
  * MetricsPrometheusAutoConfiguration is a configuration class that sets up
@@ -15,6 +20,7 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration(proxyBeanMethods = false)
 @EnableConfigurationProperties(MetricsProperties.class)
+@AutoConfigureAfter(VenusMultiLevelCacheAutoConfiguration.class)
 public class MetricsPrometheusAutoConfiguration {
     /**
      * Sets up the Prometheus metrics registry using the provided metrics properties.
@@ -53,8 +59,17 @@ public class MetricsPrometheusAutoConfiguration {
      */
     @ConditionalOnClass(MeterRegistry.class)
     @Bean
-    public DefaultJmxMetrics defaultJmxMetrics() {
-        return new DefaultJmxMetrics();
+    public JmxMetrics defaultJmxMetrics() {
+        return new JmxMetrics();
+    }
+
+    @ConditionalOnBean(VenusMultiLevelCacheManager.class)
+    @DependsOn("venusMultiLevelCacheManager")
+    @Bean(initMethod = "init", destroyMethod = "shutdown")
+    public CacheMetrics cacheMetrics(VenusMultiLevelCacheManager cacheManager, MetricsProperties properties) {
+        CacheSelector selector = (VenusMultiLevelValueAdaptingCache)cacheManager.getCache(VenusMultiLevelCacheConstants.VENUS_CACHE_CALLBACK_NAME);
+        Cache<String, Object> primaryCache = selector.primaryCache();
+        return new CacheMetrics(primaryCache, properties.getCacheMetricsPeriod(), properties.isCacheMetricsEnabled());
     }
 
 }

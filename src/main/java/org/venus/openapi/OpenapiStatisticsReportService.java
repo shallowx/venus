@@ -130,6 +130,9 @@ public class OpenapiStatisticsReportService implements IOpenapiStatisticsReportS
                     if (size > statisticsReportProperties.getReportSize() ||
                             System.currentTimeMillis() - lastUpdatedTime > statisticsReportProperties.getReportTimeout()) {
                         List<OpenapiStatisticsEntity> newEntities = readAndClear();
+                        if (newEntities == null || newEntities.isEmpty()) {
+                            continue;
+                        }
                         lastUpdatedTime = System.currentTimeMillis();
                         openapiStatisticsRepository.saveAll(newEntities);
                     }

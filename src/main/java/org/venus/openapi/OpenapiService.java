@@ -1,6 +1,7 @@
 package org.venus.openapi;
 
 import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.ObjectProvider;
@@ -9,11 +10,12 @@ import org.springframework.cache.Cache;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.venus.cache.*;
-
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
 import static org.venus.cache.VenusMultiLevelCacheConstants.VENUS_REDIRECT_CACHE_NAME;
@@ -73,6 +75,12 @@ public class OpenapiService implements IOpenapiService, Callback {
      * within the system.
      */
     private static final String VENUS_INITIALIZER_KV = "venus-initializer-kv";
+    /**
+     * A statically initialized instance of {@code ScheduledThreadPoolExecutor} used for scheduling tasks
+     * to run after a given delay or to execute periodically. It is configured with a single thread and
+     * uses a virtual thread factory to generate threads named "check-primary-cache".
+     */
+    private static final ScheduledThreadPoolExecutor scheduledPool =(ScheduledThreadPoolExecutor) Executors.newScheduledThreadPool(1, Thread.ofVirtual().name("check-primary-cache").factory());
 
     /**
      * Constructs an OpenapiService with specified dependencies.
@@ -91,8 +99,23 @@ public class OpenapiService implements IOpenapiService, Callback {
         this.properties = properties;
         this.redisTemplate = redisTemplate;
         this.alarm = provider.getIfAvailable();
+
+        this.checkMultiLevelCacheIsConsistent();
     }
 
+    /**
+     * Initializes the Venus Redis configuration. This method ensures that the Redis cache is populated with necessary
+     * data from the database upon the application's startup. If the Redis configuration has already been initialized,
+     * it avoids reloading the initialization data multiple times, particularly in cases of restarts or expansions.
+     *
+     * If the Redis configuration has not been initialized:
+     * - Logs a warning if initialization is not needed.
+     * - Attempts to set a unique initialization key in Redis to prevent multiple initializations.
+     * - Retrieves a list of entities from the OpenAPI repository and populates the cache with these entities.
+     * - Catches and logs any exception that occurs during the caching process.
+     *
+     * The method includes safety checks and logging to ensure traceability and error tracking during the initialization process.
+     */
     @PostConstruct
     public void init() {
         if (!properties.isInitialized()) {
@@ -224,5 +247,174 @@ public class OpenapiService implements IOpenapiService, Callback {
          * The type of callback request, indicating whether it is an "update" or "evict" operation.
          */
         private String type; // update or evict
+    }
+
+    /**
+     * Ensures that the multi-level cache is consistent by periodically scheduling a consistency task.
+     *
+     * This method retrieves the primary and secondary caches from a {@link VenusMultiLevelValueAdaptingCache} instance.
+     * It then creates a {@link ConsistentTask} which checks the consistency between the primary cache and the secondary Redis cache.
+     * The task is scheduled at fixed intervals with an initial delay using a scheduled executor service.
+     *
+     * In case of an exception during scheduling, it logs an error message and clears the scheduled task queue before
+     * attempting to reschedule the consistency task.
+     */
+    private void checkMultiLevelCacheIsConsistent() {
+        CacheSelector selector = (VenusMultiLevelValueAdaptingCache)manager.getCache(VENUS_REDIRECT_CACHE_NAME);
+        com.github.benmanes.caffeine.cache.Cache<String, Object> primaryCache = selector.primaryCache();
+        RedisTemplate<String, CacheWrapper> secondCache = selector.secondCache();
+        OpenapiService.ConsistentTask consistentTask = new ConsistentTask(primaryCache, secondCache, alarm);
+        try {
+            scheduledPool.scheduleAtFixedRate(consistentTask, properties.getInitialDelay().toMillis(), properties.getCheckPrimaryCachePeriod().toMillis(), TimeUnit.MILLISECONDS);
+        }catch (Exception e){
+            if (log.isErrorEnabled()) {
+                log.error("Venus check cache consistent failure", e);
+            }
+            if (!scheduledPool.isShutdown()) {
+                // Discard previous tasks
+                BlockingQueue<Runnable> scheduledPoolQueue = scheduledPool.getQueue();
+                if (!scheduledPoolQueue.isEmpty()) {
+                    scheduledPoolQueue.clear();
+                }
+                scheduledPool.scheduleAtFixedRate(consistentTask, properties.getInitialDelay().toMillis(), properties.getCheckPrimaryCachePeriod().toMillis(), TimeUnit.MILLISECONDS);
+            } else {
+                if (log.isWarnEnabled()) {
+                    log.warn("The multi-level cache consistency check task will be canceled when the thread pool stops running");
+                }
+            }
+        }
+    }
+
+    static class ConsistentTask implements Runnable {
+        /**
+         * A primary cache for storing key-value pairs using the Caffeine caching library.
+         * This cache is used as the main cache in the ConsistentTask class to store and retrieve
+         * objects efficiently.
+         *
+         * The primaryCache variable is thread-safe and designed to handle high-concurrency scenarios,
+         * providing optimal performance for common caching needs. It is marked as final to ensure
+         * that its reference does not change once initialized.
+         *
+         * The cache is expected to store String keys with their corresponding Object values.
+         *
+         * Note: com.github.benmanes.caffeine.cache.Cache library is used for the cache implementation.
+         */
+        private final com.github.benmanes.caffeine.cache.Cache<String, Object> primaryCache;
+
+        /**
+         * The secondary cache that uses Redis as its storage mechanism.
+         * This cache is used to ensure data consistency by providing a backup
+         * to the primary in-memory cache and serves as the source of truth
+         * during consistency checks.
+         */
+        private final RedisTemplate<String, CacheWrapper> secondCache;
+        /**
+         * The `alarm` field is an instance of the `OpenapiCacheConsistentAlarm` interface
+         * used to handle cache inconsistency alerts in the ConsistentTask class.
+         * It is initialized through the constructor and utilized to signal inconsistencies
+         * in the cache layers by invoking its `alarm` method when discrepancies are detected
+         * between the primary and secondary cache.
+         */
+        private final OpenapiCacheConsistentAlarm alarm;
+
+        /**
+         * Initializes a new instance of ConsistentTask with the specified primary cache, second cache, and alarm.
+         *
+         * @param primaryCache the primary in-memory cache used for storing data
+         * @param secondCache the secondary cache using Redis for data storage
+         * @param alarm the alarm mechanism used to signal cache inconsistencies
+         */
+        public ConsistentTask(com.github.benmanes.caffeine.cache.Cache<String, Object> primaryCache, RedisTemplate<String, CacheWrapper> secondCache, OpenapiCacheConsistentAlarm alarm) {
+            this.primaryCache = primaryCache;
+            this.secondCache = secondCache;
+            this.alarm = alarm;
+        }
+
+        /**
+         * Checks the consistency between a primary cache and a secondary cache,
+         * updating the primary cache to reflect the state of the secondary cache.
+         *
+         * This method performs the following actions:
+         * - Retrieves all entries from the primary cache.
+         * - Logs a warning and returns if the primary cache is empty.
+         * - Retrieves corresponding entries from the secondary cache.
+         * - Logs a debug message and returns if the secondary cache is empty.
+         * - Iterates over the key-value pairs in the primary cache and verifies if each entry is
+         *   present in the secondary cache:
+         *   - Logs a warning, invalidates the primary cache entry, and triggers an alarm if the
+         *     key from the primary cache is missing in the secondary cache.
+         *   - If the key is present in both caches but the values differ, updates the primary
+         *     cache with the value from the secondary cache.
+         *   - Logs a debug message if the key and value match between the caches.
+         * - Catches and logs any exceptions that occur during the execution and triggers an alarm
+         *   indicating a consistent check failure.
+         */
+        @Override
+        public void run() {
+            try {
+                ConcurrentMap<String, Object> values = primaryCache.asMap();
+                if (values.isEmpty()) {
+                    if (log.isWarnEnabled()) {
+                        log.warn("Primary cache is empty");
+                    }
+                    return;
+                }
+
+                Set<String> keySet = values.keySet();
+                List<CacheWrapper> cacheWrappers = secondCache.opsForValue().multiGet(keySet);
+                if (cacheWrappers == null || cacheWrappers.isEmpty()) {
+                    if (log.isDebugEnabled()) {
+                        log.debug("SecondCache cache is empty");
+                    }
+                    return;
+                }
+
+                List<String> secondCacheKeys = cacheWrappers.stream().map(CacheWrapper::getKey).toList();
+                values.forEach((k, v) -> {
+                    if (v instanceof CacheWrapper) {
+                        String key = ((CacheWrapper) v).getKey();
+                        Object value = ((CacheWrapper) v).getValue();
+                        if (!secondCacheKeys.contains(key)) {
+                            if (log.isWarnEnabled()) {
+                                log.warn("Venus primary cache key[{}] is not exists in secondCache, will be remote it", key);
+                            }
+                            primaryCache.invalidate(key);
+                            alarm.alarm(key, value, "evict");
+                        } else {
+                            for (CacheWrapper cacheWrapper : cacheWrappers) {
+                                if (key.equals(cacheWrapper.getKey()) && value.equals(cacheWrapper.getValue())) {
+                                    if (log.isDebugEnabled()) {
+                                        log.debug("Primary cache of key[{}] the same as the second cache", key);
+                                    }
+                                    continue;
+                                }
+                                // put the new value of the cache key
+                                primaryCache.put(key, cacheWrapper);
+                            }
+                        }
+                    }
+                });
+            } catch (Exception e) {
+                if (log.isErrorEnabled()) {
+                    log.error("Venus check cache consistent failure", e);
+                }
+                alarm.alarm("check-cache-consistent", e, "check-cache-consistent");
+            }
+        }
+    }
+
+    /**
+     * The destroy method is annotated with @PreDestroy and is intended to be called
+     * when the application is shutting down. It ensures that the scheduledPool is properly
+     * shut down if it has not already been done.
+     *
+     * If the scheduledPool is not already in a shutdown state, this method invokes the
+     * shutdown process to release resources and properly terminate any scheduled tasks.
+     */
+    @PreDestroy
+    public void destroy() {
+        if (!scheduledPool.isShutdown()) {
+            scheduledPool.shutdownNow();
+        }
     }
 }

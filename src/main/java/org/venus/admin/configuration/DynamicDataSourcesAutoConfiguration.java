@@ -7,6 +7,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.datasource.lookup.AbstractRoutingDataSource;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
 import javax.sql.DataSource;
 import java.util.HashMap;
 import java.util.Map;
@@ -20,6 +23,7 @@ import java.util.Map;
 @Configuration(proxyBeanMethods = false)
 @EnableConfigurationProperties(DatasourceProperties.class)
 public class DynamicDataSourcesAutoConfiguration {
+
     /**
      * The name of the default datasource used in the dynamic datasource configuration.
      *
