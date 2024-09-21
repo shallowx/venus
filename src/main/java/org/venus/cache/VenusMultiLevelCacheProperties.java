@@ -21,12 +21,12 @@ public class VenusMultiLevelCacheProperties {
      * The initial capacity of the multi-level cache.
      * This determines how many elements the cache can initially hold.
      */
-    private int initCapacity = 1000;
+    private int initCapacity;
     /**
      * Defines the maximum capacity for the multi-level cache.
      * By default, this is set to the minimum representable integer value.
      */
-    private int maxCapacity = Integer.MIN_VALUE;
+    private int maxCapacity;
     /**
      * Specifies the duration in milliseconds after which a cache entry should expire
      * since the last time it was written.
