@@ -48,16 +48,24 @@ summary +530512   in 00:00:15 =36549.2/s  Avg:20 Min:0 Max:192 Err:0(0.00%) Acti
 summary =10926237 in 00:05:00 =36379.7/s  Avg:20 Min:0 Max:267 Err:0(0.00%)
 ```
 
-## Support Protocol
+## Quickly Start
+- Start MYSQL
+- Start Redis
+- Check the system setting(application.properties)
 
-- HTTP
-- TCP/IP
+### Application
+- Start ```org.venus.VenusApplication```
+- Add URL mapping, see ```org.venus.admin.controller.LinksRestController#add()```
 
-HTTP protocol uses RESTful API and TCP/IP protocol uses Server/Client mode
+### Docker
+- Add URL mapping, see ```org.venus.admin.controller.LinksRestController#add()```
+- Ensure the JVM stack startup parameters in the script (run.sh) can be start service. Since the default is 12G, the container may have insufficient memory, causing the startup to fail
+- ```docker build -t venus .```
+- ```docker run --name venus -p 8029:8029 venus```
 
 ## Metrics
 
-- see this package 'org.venus.metrics'
+- see```http://${host}/18029/venus/actuator```
 
 ## Links
 

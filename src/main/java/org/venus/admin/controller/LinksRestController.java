@@ -65,7 +65,7 @@ public class LinksRestController {
      *         or a failure response with an error code and message if an exception occurs.
      */
     @GetMapping("/detail/{id}")
-    public GenericRestApiResponse<LinksResponse> detail(@PathVariable @NotNull
+    public GenericRestApiResponse<LinksResponse> detail(@PathVariable
                                                         @Validated
                                                         @NotNull
                                                         @Min(0)
@@ -112,11 +112,11 @@ public class LinksRestController {
      * @return a GenericRestApiResponse indicating the success or failure of the update operation
      */
     @PostMapping("/update")
-    public GenericRestApiResponse<Void> update(@RequestBody @Validated LinksRequest request) {
+    public GenericRestApiResponse<Long> update(@RequestBody @Validated LinksRequest request) {
         try {
             LinksDao ld = LinksDao.fromEntity(request);
             iLinksService.update(ld);
-            return GenericRestApiResponse.success();
+            return GenericRestApiResponse.success(ld.getId());
         } catch (Exception e) {
             if (log.isInfoEnabled()) {
                 log.error("Update Links failure", e);
@@ -134,14 +134,14 @@ public class LinksRestController {
      *         Returns success if the deletion is successful, otherwise returns a failure response.
      */
     @DeleteMapping("/delete/{id}")
-    public GenericRestApiResponse<Void> delete(@PathVariable
+    public GenericRestApiResponse<Long> delete(@PathVariable
                                                @Validated
                                                @NotNull
                                                @Min(0)
                                                @Max(Long.MAX_VALUE) long id) {
         try {
             iLinksService.delete(id);
-            return GenericRestApiResponse.success();
+            return GenericRestApiResponse.success(id);
         } catch (Exception e) {
             if (log.isErrorEnabled()) {
                 log.error("Delete links[id:{}] failure", id, e);
@@ -149,5 +149,4 @@ public class LinksRestController {
             return GenericRestApiResponse.fail(VenusRestApiCode.VENUS_ADMIN_EXCEPTION, VenusRestApiCode.VENUS_ADMIN_EXCEPTION.message());
         }
     }
-
 }

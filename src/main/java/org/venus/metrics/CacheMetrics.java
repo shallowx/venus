@@ -23,73 +23,80 @@ import java.util.concurrent.TimeUnit;
 public class CacheMetrics {
 
     /**
-     * A thread-safe map that maintains a count of hits for specific keys.
-     * The keys are strings and the values are Counter instances.
-     * This variable is used to keep track of the number of hits for each key.
+     * A thread-safe map that stores the distribution summary for hit counts.
+     *
+     * This map uses string keys to represent different categories or identifiers for
+     * which the hit counts are maintained. The values are instances of
+     * DistributionSummary, which summarize statistical data of the hits.
+     *
+     * The use of ConcurrentHashMap ensures that the operations on the map
+     * are thread-safe and can be safely used in a concurrent context without
+     * requiring explicit synchronization.
      */
-    private static final ConcurrentHashMap<String, Counter> hitCount = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<String, DistributionSummary> hitCount = new ConcurrentHashMap<>();
     /**
-     * A thread-safe map that keeps track of the count of missed accesses.
-     * The keys are of type String representing the identifiers of the elements.
-     * The values are Counter objects that maintain the specific miss count for each identifier.
+     * A thread-safe map that holds distribution summaries for recording miss counts.
+     * Each key is a string representing an entity whose miss counts are being tracked.
+     * The value is a DistributionSummary object that maintains the statistics for the miss counts.
      */
-    private static final ConcurrentHashMap<String, Counter> missCount = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<String, DistributionSummary> missCount = new ConcurrentHashMap<>();
     /**
-     * A thread-safe map that stores the count of successful load operations per key.
-     * Each key is associated with a {@link Counter} object that tracks the number of successful loads.
-     * This map ensures concurrent access without compromising performance.
+     * A thread-safe map that holds the count of successful load operations,
+     * keyed by a load identifier of type String. Each entry in the map is a
+     * DistributionSummary object that keeps track of distribution statistics
+     * for the successful load operations associated with the corresponding key.
      */
-    private static final ConcurrentHashMap<String, Counter> loadSuccessCount = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<String, DistributionSummary> loadSuccessCount = new ConcurrentHashMap<>();
     /**
-     * A thread-safe map that keeps track of load failure counts using a Counter object.
-     * Each entry in the map is identified by a unique String key.
+     * A thread-safe map that maintains a summary of load failures for different keys.
+     * Each key is associated with a DistributionSummary, which provides statistical
+     * information about the load failure occurrences.
      */
-    private static final ConcurrentHashMap<String, Counter> loadFailureCount = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<String, DistributionSummary> loadFailureCount = new ConcurrentHashMap<>();
     /**
-     * A thread-safe map that holds the total load time for various operations, using counters to track the time.
-     * The map keys are strings that represent the names or identifiers of the operations.
-     * The values are instances of the Counter class, which encapsulate the actual load time measurement.
+     * A thread-safe, concurrent hashmap that holds DistributionSummary objects, keyed by string.
+     * Each entry represents the total load time distribution for a specific category or identifier.
      */
-    private static final ConcurrentHashMap<String, Counter> totalLoadTime = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<String, DistributionSummary> totalLoadTime = new ConcurrentHashMap<>();
     /**
-     * A thread-safe map that holds counters for eviction events.
-     * The keys are strings representing specific entities or events,
-     * and the values are Counter objects that maintain the count of evictions.
-     * This structure ensures that eviction counts are accurately tracked and can be accessed concurrently without synchronization issues.
+     * A concurrent hash map to track eviction counts in a thread-safe manner.
+     * The keys are strings representing specific identifiers, and the
+     * values are DistributionSummary objects that record statistical
+     * distribution information about eviction events.
      */
-    private static final ConcurrentHashMap<String, Counter> evictionCount = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<String, DistributionSummary> evictionCount = new ConcurrentHashMap<>();
     /**
-     * A thread-safe map that holds eviction weights for elements identified by a string key.
-     * The keys represent the unique identifiers for the items, and the values are
-     * Counter objects that track eviction weight metrics.
+     * A thread-safe concurrent hash map that stores instances of DistributionSummary
+     * keyed by a String identifier. This map is used to track the eviction weights
+     * of various elements, ensuring that operations on this structure are safe in
+     * a multi-threaded environment.
      */
-    private static final ConcurrentHashMap<String, Counter> evictionWeight = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<String, DistributionSummary> evictionWeight = new ConcurrentHashMap<>();
     /**
-     * A thread-safe map that maintains a count of requests based on their keys.
-     * The map uses a {@link ConcurrentHashMap} to handle concurrent access and updates.
-     * Each request type is represented by a {@code String} key, and its count is
-     * maintained by a {@code Counter} object.
+     * A thread-safe map that maintains distribution summaries for request counts.
+     *
+     * Each key is a string representing a unique identifier for a type of request.
+     * Each value is a DistributionSummary object that collects and summarizes
+     * statistical distributions of these request counts.
      */
-    private static final ConcurrentHashMap<String, Counter> requestCounts = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<String, DistributionSummary> requestCounts = new ConcurrentHashMap<>();
     /**
-     * A thread-safe map storing miss rate statistics for various keys.
-     * Each entry in the map is identified by a unique string key and
-     * is associated with a {@code DistributionSummary} object that
-     * tracks statistical data regarding cache misses or similar events.
+     * missRate is a thread-safe map that stores DistributionSummary objects
+     * associated with String keys. It is used to record and summarize the
+     * distribution of events or measurements, typically for tracking cache
+     * miss rates or other metrics.
      */
     private static final ConcurrentHashMap<String, DistributionSummary> missRate = new ConcurrentHashMap<>();
     /**
-     * A thread-safe map storing distribution summaries identified by a string key.
-     * <p>
-     * The key represents the identifier for the distribution summary, and the
-     * associated value is an instance of {@link DistributionSummary},
-     * which is used to store and compute the statistical distribution of a set of values.
-     * This map is designed for concurrent access.
+     * A thread-safe map that stores instances of {@code DistributionSummary}
+     * indexed by a {@code String} key. This variable is used to keep track of
+     * hit rate metrics for various entities identified by the keys.
      */
     private static final ConcurrentHashMap<String, DistributionSummary> hitRate = new ConcurrentHashMap<>();
     /**
-     * A thread-safe map that stores `DistributionSummary` objects, keyed by a `String`,
-     * representing the failure rates of load operations.
+     * A thread-safe map that holds {@link DistributionSummary} instances indexed by a string key.
+     * This map is used to track the failure rates of load operations and allows concurrent access
+     * from multiple threads to ensure performance and consistency in a multi-threaded environment.
      */
     private static final ConcurrentHashMap<String, DistributionSummary> loadFailureRate = new ConcurrentHashMap<>();
     /**
@@ -225,12 +232,11 @@ public class CacheMetrics {
     }
 
     /**
-     * Updates the hit rate metric for the cache.
-     *
-     * This method retrieves the current cache statistics, specifically
-     * the hit rate, and then records this metric using a
-     * DistributionSummary. If the DistributionSummary for the hit rate
-     * does not exist, it is created and registered with the appropriate tags.
+     * The hitRate method records the hit rate statistics of the cache.
+     * It retrieves the CacheStats and records the hit rate in a DistributionSummary.
+     * If a DistributionSummary for "hitRate" does not already exist, it is created
+     * and registered with the specified tags.
+     * This method is intended to be used for monitoring cache performance metrics.
      */
     public void hitRate() {
         CacheStats stats = cache.stats();
@@ -247,16 +253,14 @@ public class CacheMetrics {
     }
 
     /**
-     * Updates the miss rate statistic for a cache.
-     * <p>
-     * This method retrieves the current cache statistics and records the miss rate
-     * using a distribution summary. If the distribution summary for the miss rate
-     * doesn't exist, it initializes and registers a new summary with appropriate tags.
-     * <p>
-     * The tags used for the distribution summary include:
-     * - application: venus
-     * - type: cache_miss_rate
-     * - version: 1.0.0
+     * Records the cache miss rate using a distribution summary.
+     *
+     * This method retrieves the cache statistics and updates the miss rate
+     * distribution summary with the current cache miss rate metrics.
+     * If the summary does not exist, it initializes and registers a new one
+     * with predefined tags representing the application, type, and version.
+     *
+     * @throws NullPointerException if cache or registry is null
      */
     public void missRate() {
         CacheStats stats = cache.stats();
@@ -273,12 +277,17 @@ public class CacheMetrics {
     }
 
     /**
-     * Records the cache load failure rate into a distribution summary for monitoring purposes.
+     * Loads and records the cache load failure rate using a {@link DistributionSummary}.
      *
-     * The method retrieves statistics from the cache and checks if a distribution
-     * summary for the load failure rate already exists. If it doesn't exist, it creates
-     * a new distribution summary with specific tags and registers it. Finally, the method
-     * records the load failure rate from the cache statistics into the distribution summary.
+     * This method fetches the current cache statistics and retrieves or creates
+     * a {@link DistributionSummary} to track the load failure rate of the cache.
+     * The failure rate is recorded in the summary.
+     *
+     * The summary is tagged with information such as the application name, type,
+     * and version.
+     *
+     * Note: The method assumes that the cache and the loadFailureRate map are properly initialized
+     * and accessible within the class context.
      */
     public void loadFailureRate() {
         CacheStats stats = cache.stats();
@@ -295,183 +304,181 @@ public class CacheMetrics {
     }
 
     /**
-     * Updates the request count metric for cache requests.
+     * Records the cache request count in a distribution summary metric.
+     * This method retrieves the cache statistics and records the request count
+     * in a pre-defined distribution summary named "requestCounts". If the
+     * distribution summary does not exist in the map, it initializes and registers one.
      *
-     * This method retrieves the current cache statistics and updates
-     * the request count metric in the registry. It first checks if the
-     * request count counter is already present in the requestCounts map.
-     * If it is not present, it creates and registers a new counter.
-     * Finally, it increments the counter by the current request count
-     * from the cache statistics.
+     * The distribution summary is tagged with:
+     * - application: "venus"
+     * - type: "cache_request_count"
+     * - version: "1.0.0"
      */
     public void requestCount() {
         CacheStats stats = cache.stats();
-        Counter counter = requestCounts.get("requestCounts");
-        if (counter == null) {
-            counter = requestCounts.computeIfAbsent("requestCounts",
-                    s -> Counter.builder("requestCounts")
+        DistributionSummary summary = requestCounts.get("requestCounts");
+        if (summary == null) {
+            summary = requestCounts.computeIfAbsent("requestCounts",
+                    s -> DistributionSummary.builder("requestCounts")
                             .tags(Tags.of("application", "venus")
                                     .and("type", "cache_request_count")
                                     .and(Tags.of("version", "1.0.0"))
                             ).register(registry));
         }
-        counter.increment(stats.requestCount());
+        summary.record(stats.requestCount());
     }
 
     /**
-     * Updates the hit count metric for a cache.
-     *
-     * This method retrieves the current cache statistics and increments the hit count metric
-     * accordingly. If the hit count metric does not exist, it is created and registered with a set
-     * of predefined tags before being incremented.
+     * Updates the hit count metric for the cache.
+     * This method retrieves the cache statistics and records the hit count to a
+     * distribution summary named "hitCount". If the summary does not exist, it creates
+     * and registers a new one with specific tags.
      */
     public void hitCount() {
         CacheStats stats = cache.stats();
-        Counter counter = hitCount.get("hitCount");
-        if (counter == null) {
-            counter = hitCount.computeIfAbsent("hitCount",
-                    s -> Counter.builder("hitCount")
+        DistributionSummary summary = hitCount.get("hitCount");
+        if (summary == null) {
+            summary = hitCount.computeIfAbsent("hitCount",
+                    s -> DistributionSummary.builder("hitCount")
                             .tags(Tags.of("application", "venus")
                                     .and("type", "cache_hit_count")
                                     .and(Tags.of("version", "1.0.0"))
                             ).register(registry));
         }
-        counter.increment(stats.hitCount());
+        summary.record(stats.hitCount());
     }
 
     /**
-     * Updates the miss count for the cache by retrieving the current cache statistics and
-     * incrementing the counter associated with the "missCount" metric.
+     * Records the number of cache misses using a DistributionSummary.
      *
-     * If the counter for "missCount" does not already exist, it will be created and
-     * registered with the specified tags: "application" set to "venus", "type" set to "cache_miss_count",
-     * and "version" set to "1.0.0". The counter is then incremented by the current miss count
-     * from the cache statistics.
-     *
-     * This method assumes the existence of a cache object with a stats() method that provides
-     * the current statistics of the cache, including the miss count.
-     *
-     * It also assumes the existence of a missCount map to store the counters by metric names
-     * and a registry object to register new counters.
+     * This method collects the current cache stats and updates a DistributionSummary
+     * with the latest miss count. If the DistributionSummary for "missCount" does not exist,
+     * it initializes and registers it with specific tags.
      */
     public void missCount() {
         CacheStats stats = cache.stats();
-        Counter counter = missCount.get("missCount");
-        if (counter == null) {
-            counter = missCount.computeIfAbsent("missCount",
-                    s -> Counter.builder("missCount")
+        DistributionSummary summary = missCount.get("missCount");
+        if (summary == null) {
+            summary = missCount.computeIfAbsent("missCount",
+                    s -> DistributionSummary.builder("missCount")
                             .tags(Tags.of("application", "venus")
                                     .and("type", "cache_miss_count")
                                     .and(Tags.of("version", "1.0.0"))
                             ).register(registry));
         }
-        counter.increment(stats.missCount());
+        summary.record(stats.missCount());
     }
 
     /**
-     * Updates the counter for the number of successful cache loads.
-     * <p>
-     * This method retrieves the cache statistics and updates the load success count metric.
-     * If the metric counter does not exist yet, it will be created and registered.
-     * The counter is incremented by the number of successful load operations reported by the cache.
+     * Tracks and records the number of successful cache load operations.
+     *
+     * This method retrieves the cache statistics and records the count of successful
+     * cache loads in a distribution summary. If the summary does not exist, it is
+     * created and registered in the specified registry with appropriate tags.
      */
     public void loadSuccessCount() {
         CacheStats stats = cache.stats();
-        Counter counter = loadSuccessCount.get("loadSuccessCount");
-        if (counter == null) {
-            counter = loadSuccessCount.computeIfAbsent("loadSuccessCount",
-                    s -> Counter.builder("loadSuccessCount")
+        DistributionSummary summary = loadSuccessCount.get("loadSuccessCount");
+        if (summary == null) {
+            summary = loadSuccessCount.computeIfAbsent("loadSuccessCount",
+                    s -> DistributionSummary.builder("loadSuccessCount")
                             .tags(Tags.of("application", "venus")
                                     .and("type", "cache_load_success_count")
                                     .and(Tags.of("version", "1.0.0"))
                             ).register(registry));
         }
-        counter.increment(stats.loadSuccessCount());
+        summary.record(stats.loadSuccessCount());
     }
 
     /**
-     * Loads the failure count from the cache statistics and updates the corresponding
-     * counter in the loadFailureCount map. If the counter does not exist, it initializes
-     * and registers a new counter with the specified tags.
+     * Updates the load failure count metric for the cache.
+     *
+     * This method retrieves cache statistics, specifically the load failure count,
+     * and records it in a summary distribution after creating or retrieving the
+     * appropriate metric summary.
+     *
+     * The method assumes that a cache object and a registry for metrics are
+     * already set up and available for use.
      */
     public void loadFailureCount() {
         CacheStats stats = cache.stats();
-        Counter counter = loadFailureCount.get("loadFailureCount");
-        if (counter == null) {
-            counter = loadFailureCount.computeIfAbsent("loadFailureCount",
-                    s -> Counter.builder("loadFailureCount")
+        DistributionSummary summary = loadFailureCount.get("loadFailureCount");
+        if (summary == null) {
+            summary = loadFailureCount.computeIfAbsent("loadFailureCount",
+                    s -> DistributionSummary.builder("loadFailureCount")
                             .tags(Tags.of("application", "venus")
                                     .and("type", "cache_load_failure_count")
                                     .and(Tags.of("version", "1.0.0"))
                             ).register(registry));
         }
-        counter.increment(stats.loadFailureCount());
+        summary.record(stats.loadFailureCount());
     }
 
     /**
-     * Calculates the total load time of a cache and increments the corresponding
-     * monitoring counter with this value.
+     * Records the total load time of the cache into a distribution summary.
      *
-     * This method retrieves the cache statistics and updates a counter that tracks
-     * the total load time for cache operations. If the counter does not already
-     * exist, it is created with appropriate tags and registered in the monitoring
-     * registry.
+     * This method collects the total load time statistics from a cache and
+     * records it in a distribution summary. The summary is registered with a
+     * monitoring system if it is not already present.
+     *
+     * The recorded metrics contain tags for application name ("venus"),
+     * metric type ("cache_total_load_time"), and version ("1.0.0").
      */
     public void totalLoadTime() {
         CacheStats stats = cache.stats();
-        Counter counter = totalLoadTime.get("totalLoadTime");
-        if (counter == null) {
-            counter = totalLoadTime.computeIfAbsent("totalLoadTime",
-                    s -> Counter.builder("totalLoadTime")
+        DistributionSummary summary = totalLoadTime.get("totalLoadTime");
+        if (summary == null) {
+            summary = totalLoadTime.computeIfAbsent("totalLoadTime",
+                    s -> DistributionSummary.builder("totalLoadTime")
                             .tags(Tags.of("application", "venus")
                                     .and("type", "cache_total_load_time")
                                     .and(Tags.of("version", "1.0.0"))
                             ).register(registry));
         }
-        counter.increment(stats.totalLoadTime());
+        summary.record(stats.totalLoadTime());
     }
 
     /**
-     * Increments the eviction count metric based on the cache statistics.
-     * This method retrieves the current eviction count from the cache statistics
-     * and updates a Counter metric named "evictionCount". If the counter does not
-     * already exist in the evictionCount map, it will create and register a new
-     * Counter with relevant tags, and then increment it according to the new
-     * eviction count retrieved from the cache stats.
+     * Records the number of cache evictions.
+     *
+     * This method retrieves cache statistics, specifically the eviction count,
+     * and records this value in a distribution summary. If the distribution summary
+     * for "evictionCount" does not exist, it initializes and registers a new one
+     * with specific tags, including application name, type, and version.
      */
     public void evictionCount() {
         CacheStats stats = cache.stats();
-        Counter counter = evictionCount.get("evictionCount");
-        if (counter == null) {
-            counter = evictionCount.computeIfAbsent("evictionCount",
-                    s -> Counter.builder("evictionCount")
+        DistributionSummary summary = evictionCount.get("evictionCount");
+        if (summary == null) {
+            summary = evictionCount.computeIfAbsent("evictionCount",
+                    s -> DistributionSummary.builder("evictionCount")
                             .tags(Tags.of("application", "venus")
                                     .and("type", "cache_eviction_count")
                                     .and(Tags.of("version", "1.0.0"))
                             ).register(registry));
         }
-        counter.increment(stats.evictionCount());
+        summary.record(stats.evictionCount());
     }
 
 
     /**
-     * Updates the eviction weight metric for the cache.
-     * This method retrieves the current cache statistics to determine the eviction weight.
-     * It then increments a counter with the eviction weight value. If the counter does not
-     * exist, it is created and registered before the increment operation.
+     * Records the eviction weight of the cache into a metrics summary.
+     * This method retrieves the cache statistics and updates the eviction weight
+     * metric. If the eviction weight summary does not exist, it creates a new summary
+     * with appropriate tags and registers it in the metrics registry.
      */
     public void evictionWeight() {
         CacheStats stats = cache.stats();
-        Counter counter = evictionWeight.get("evictionWeight");
-        if (counter == null) {
-            counter = evictionWeight.computeIfAbsent("evictionWeight",
-                    s -> Counter.builder("evictionWeight")
+        DistributionSummary summary = evictionWeight.get("evictionWeight");
+        if (summary == null) {
+            summary = evictionWeight.computeIfAbsent("evictionWeight",
+                    s -> DistributionSummary.builder("evictionWeight")
                             .tags(Tags.of("application", "venus")
                                     .and("type", "cache_eviction_weight")
                                     .and(Tags.of("version", "1.0.0"))
                             ).register(registry));
         }
-        counter.increment(stats.evictionWeight());
+        summary.record(stats.evictionWeight());
     }
 
     /**
