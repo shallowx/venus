@@ -95,13 +95,14 @@ public class OpenapiStatisticsReportService implements IOpenapiStatisticsReportS
     private ScheduledExecutorService scheduledExecutorService;
 
     /**
-     * Reports the statistics by writing the provided OpenapiStatisticsEntity.
+     * Processes and reports the provided OpenapiStatisticsEntity.
      *
-     * @param entity The OpenapiStatisticsEntity object containing the statistics to be reported.
+     * @param entity the OpenapiStatisticsEntity object to be processed and reported
+     * @return true if the entity was successfully processed and reported, false otherwise
      */
     @Override
-    public void report(OpenapiStatisticsEntity entity) {
-        this.write(entity);
+    public boolean report(OpenapiStatisticsEntity entity) {
+       return this.write(entity);
     }
 
     /**
@@ -165,17 +166,24 @@ public class OpenapiStatisticsReportService implements IOpenapiStatisticsReportS
     }
 
     /**
-     * Writes an OpenapiStatisticsEntity to the internal collection.
+     * Writes the given OpenapiStatisticsEntity to the end of the entities list.
      *
-     * @param entity the OpenapiStatisticsEntity to be written to the collection
+     * @param entity the OpenapiStatisticsEntity to be written
+     * @return true if the entity is successfully written, false otherwise
      */
-    private void write(OpenapiStatisticsEntity entity) {
+    private boolean write(OpenapiStatisticsEntity entity) {
         readLock.lock();
         try {
             entities.addLast(entity);
-        } finally {
+        } catch (Exception e) {
+            if (log.isErrorEnabled()) {
+                log.error("Write statistics report failure", e);
+            }
+            return false;
+        }finally {
             readLock.unlock();
         }
+        return true;
     }
 
     /**

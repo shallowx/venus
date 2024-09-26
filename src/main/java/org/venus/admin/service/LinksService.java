@@ -9,6 +9,8 @@ import org.venus.admin.domain.LinksDao;
 import org.venus.admin.domain.LinksEntity;
 import org.venus.admin.repository.LinksRepository;
 import org.venus.openapi.OpenapiEntity;
+import org.venus.support.VenusException;
+
 import java.util.List;
 import java.util.concurrent.*;
 
@@ -67,12 +69,20 @@ public class LinksService implements ILinksService {
     }
 
     /**
-     * Adds a new link represented by the given LinksDao object to the repository and updates the cache.
+     * Adds a new LinksDao object to the repository and updates the cache.
+     * If an entity with the same ID already exists, a VenusException is thrown.
+     * In case of an error while adding the links to the cache, it retries the update at fixed intervals.
      *
-     * @param ld The LinksDao object containing data about the link to be added.
+     * @param ld the LinksDao object to be added.
+     * @return true if the link was successfully added and the cache was updated, false if there was an error while updating the cache and a retry is scheduled.
      */
     @Override
-    public void add(LinksDao ld) {
+    public boolean add(LinksDao ld) {
+        LinksEntity entity = get(ld.getId());
+        if (entity != null) {
+            throw new VenusException(String.format("Duplicate id[%d], multiple mapping URLs are not supported", ld.getId()));
+        }
+
         linksRepository.add(ld);
         try {
             Cache cache = cacheManager.getCache(VENUS_REDIRECT_CACHE_NAME);
@@ -100,16 +110,20 @@ public class LinksService implements ILinksService {
                     retryUpdateCacheIfErrorExecutor.scheduleAtFixedRate(task, 0, 5000, TimeUnit.MILLISECONDS);
                 }
             }
+            return false;
         }
+        return true;
     }
 
     /**
-     * Updates an existing link entry in the database and updates the cache with the new link data.
+     * Updates the provided LinksDao object in the database and attempts to update the corresponding cache.
+     * In case of an exception during cache update, a retry mechanism is scheduled.
      *
-     * @param ld The LinksDao object containing updated data for the link to be modified.
+     * @param ld the LinksDao object that needs to be updated
+     * @return true if the update operation and the cache update were successful, false otherwise
      */
     @Override
-    public void update(LinksDao ld) {
+    public boolean update(LinksDao ld) {
         linksRepository.update(ld);
         try {
             Cache cache = cacheManager.getCache(VENUS_REDIRECT_CACHE_NAME);
@@ -137,19 +151,19 @@ public class LinksService implements ILinksService {
                     retryUpdateCacheIfErrorExecutor.scheduleAtFixedRate(task, 0, 5000, TimeUnit.MILLISECONDS);
                 }
             }
+            return false;
         }
+        return true;
     }
 
     /**
-     * Deletes a link entity from the system by its unique identifier. This method performs the following actions:
-     * - Retrieves the link entity associated with the given id.
-     * - Removes the link entity from the database.
-     * - Evicts the corresponding entry from the cache if present.
+     * Deletes a LinksEntity with the given id from the repository and evicts its cache entry.
      *
-     * @param id The unique identifier of the link entity to be deleted.
+     * @param id the identifier of the LinksEntity to delete
+     * @return true if the deletion and cache eviction succeed, false otherwise
      */
     @Override
-    public void delete(long id) {
+    public boolean delete(long id) {
         LinksEntity entity = this.get(id);
         linksRepository.remove(id);
         try {
@@ -178,6 +192,8 @@ public class LinksService implements ILinksService {
                     retryUpdateCacheIfErrorExecutor.scheduleAtFixedRate(task, 0, 5000, TimeUnit.MILLISECONDS);
                 }
             }
+            return false;
         }
+        return true;
     }
 }

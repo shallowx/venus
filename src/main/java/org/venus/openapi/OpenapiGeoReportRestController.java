@@ -38,17 +38,15 @@ public class OpenapiGeoReportRestController {
     private IOpenapiGeoService iOpenapiGeoService;
 
     /**
-     * Reports geolocation data provided in the request.
+     * Handles HTTP POST requests to report geolocation data.
      *
-     * @param request The request payload containing geolocation information to be reported. Must be a valid instance of {@link OpenapiGeoRequest}.
-     * @return A {@link GenericRestApiResponse} object. Returns a success response if the operation is successful, and a failure response with an error code and message if an exception
-     *  occurs.
+     * @param request the OpenapiGeoRequest object containing the geolocation data to be reported
+     * @return a GenericRestApiResponse containing a Boolean indicating success (true) or failure (false) of the operation
      */
     @PostMapping("/report")
-    public GenericRestApiResponse<Void> report(@RequestBody @Validated OpenapiGeoRequest request) {
+    public GenericRestApiResponse<Boolean> report(@RequestBody @Validated OpenapiGeoRequest request) {
         try {
-            iOpenapiGeoService.report(OpenapiGeoEntity.from(request));
-            return GenericRestApiResponse.success();
+            return GenericRestApiResponse.success(iOpenapiGeoService.report(OpenapiGeoEntity.from(request)));
         } catch (Exception e) {
             if (log.isErrorEnabled()) {
                 log.error("Openapi report geo data failure");

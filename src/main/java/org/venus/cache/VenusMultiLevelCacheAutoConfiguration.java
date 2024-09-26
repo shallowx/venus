@@ -128,12 +128,8 @@ public class VenusMultiLevelCacheAutoConfiguration {
             if (defaultListenerMethod == null) {
                 return new MessageListenerAdapter();
             }
-
             String methodName = defaultListenerMethod.getName();
-            if (StringUtils.hasText(methodName)) {
-                return new MessageListenerAdapter(receiver, methodName);
-            }
-            return new MessageListenerAdapter();
+            return new MessageListenerAdapter(receiver, methodName);
         }
 
         /**

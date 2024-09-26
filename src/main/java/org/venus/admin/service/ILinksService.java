@@ -28,23 +28,26 @@ public interface ILinksService {
     LinksEntity get(long id);
 
     /**
-     * Adds a new link represented by the given LinksDao object.
+     * Adds a new link to the system.
      *
-     * @param ld The LinksDao object containing data about the link to be added.
+     * @param ld the LinksDao object containing the link data to be added
+     * @return true if the link was successfully added, false otherwise
      */
-    void add(LinksDao ld);
+    boolean add(LinksDao ld);
 
     /**
-     * Updates an existing link entry in the database using the provided LinksDao object.
+     * Updates an existing link entry with the data provided in the LinksDao object.
      *
-     * @param ld The LinksDao object containing updated data for the link to be modified.
+     * @param ld LinksDao object containing the updated information for the link entry.
+     * @return true if the update was successful, false otherwise.
      */
-    void update(@Param("ld") LinksDao ld);
+    boolean update(@Param("ld") LinksDao ld);
 
     /**
-     * Deletes a link entity from the system by its unique identifier.
+     * Deletes a link entity based on its unique identifier.
      *
-     * @param id The unique identifier of the link entity to be deleted.
+     * @param id the unique identifier of the link to be deleted
+     * @return true if the deletion was successful, false otherwise
      */
-    void delete(long id);
+    boolean delete(long id);
 }

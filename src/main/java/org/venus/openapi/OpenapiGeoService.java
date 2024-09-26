@@ -99,13 +99,14 @@ public class OpenapiGeoService implements IOpenapiGeoService {
     private ScheduledExecutorService scheduledExecutorService;
 
     /**
-     * Reports the given OpenapiGeoEntity by writing it to the designated output.
+     * Reports the provided OpenapiGeoEntity.
      *
-     * @param entity the OpenapiGeoEntity object to be reported
+     * @param entity The OpenapiGeoEntity that needs to be reported.
+     * @return true if the entity is successfully reported, false otherwise.
      */
     @Override
-    public void report(OpenapiGeoEntity entity) {
-        write(entity);
+    public boolean report(OpenapiGeoEntity entity) {
+        return write(entity);
     }
 
     /**
@@ -176,13 +177,19 @@ public class OpenapiGeoService implements IOpenapiGeoService {
      *
      * @param entity the OpenapiGeoEntity to be added to the entities list
      */
-    private void write(OpenapiGeoEntity entity) {
+    private boolean write(OpenapiGeoEntity entity) {
         readLock.lock();
         try {
             entities.addLast(entity);
+        } catch (Exception e) {
+            if (log.isErrorEnabled()) {
+                log.error("Write geo report failure", e);
+            }
+            return false;
         } finally {
             readLock.unlock();
         }
+        return true;
     }
 
     /**

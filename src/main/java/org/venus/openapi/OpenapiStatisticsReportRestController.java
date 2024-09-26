@@ -35,17 +35,15 @@ public class OpenapiStatisticsReportRestController {
     private IOpenapiStatisticsReportService iOpenapiStatisticsReportService;
 
     /**
-     * Handles the reporting of OpenAPI statistics by accepting a valid {@link OpenapiStatisticsRequest} payload,
-     * processing it, and returning a generic response indicating the success or failure of the operation.
+     * Handles the reporting of OpenAPI statistics data.
      *
-     * @param request the OpenapiStatisticsRequest containing details for the statistics report
-     * @return a GenericRestApiResponse indicating the success or failure of the report operation
+     * @param request the OpenapiStatisticsRequest object containing the statistics data to be reported
+     * @return a GenericRestApiResponse containing a Boolean indicating the success or failure of the reporting operation
      */
     @PostMapping("/report")
-    public GenericRestApiResponse<Void> report(@RequestBody @Validated OpenapiStatisticsRequest request) {
+    public GenericRestApiResponse<Boolean> report(@RequestBody @Validated OpenapiStatisticsRequest request) {
         try {
-            iOpenapiStatisticsReportService.report(OpenapiStatisticsEntity.from(request));
-            return GenericRestApiResponse.success();
+            return GenericRestApiResponse.success(iOpenapiStatisticsReportService.report(OpenapiStatisticsEntity.from(request)));
         } catch (Exception e) {
             if (log.isErrorEnabled()) {
                 log.error("Openapi report statistics data failure");

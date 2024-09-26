@@ -53,7 +53,12 @@ public class LinksRestController {
             if (log.isErrorEnabled()) {
                 log.error("Error listing links", e);
             }
-            return GenericListRestApiResponse.fail(VenusRestApiCode.VENUS_ADMIN_EXCEPTION, VenusRestApiCode.VENUS_ADMIN_EXCEPTION.message());
+            Throwable cause = e.getCause();
+            String error = null;
+            if (cause != null) {
+                error = cause.getMessage();
+            }
+            return GenericListRestApiResponse.fail(VenusRestApiCode.VENUS_ADMIN_EXCEPTION, error == null ? e.getMessage(): error);
         }
     }
 
@@ -80,7 +85,12 @@ public class LinksRestController {
             if (log.isErrorEnabled()) {
                 log.error("Error get link's detail", e);
             }
-            return GenericRestApiResponse.fail(VenusRestApiCode.VENUS_ADMIN_EXCEPTION, VenusRestApiCode.VENUS_ADMIN_EXCEPTION.message());
+            Throwable cause = e.getCause();
+            String error = null;
+            if (cause != null) {
+                error = cause.getMessage();
+            }
+            return GenericRestApiResponse.fail(VenusRestApiCode.VENUS_ADMIN_EXCEPTION, error == null ? e.getMessage(): error);
         }
     }
 
@@ -91,17 +101,20 @@ public class LinksRestController {
      * @return a GenericRestApiResponse object indicating the success or failure of the operation
      */
     @PostMapping("/add")
-    public GenericRestApiResponse<Void> add(@RequestBody @Validated LinksRequest request) {
+    public GenericRestApiResponse<Boolean> add(@RequestBody @Validated LinksRequest request) {
         try {
             LinksDao ld = LinksDao.fromEntity(request);
-            iLinksService.add(ld);
-            return GenericRestApiResponse.success();
+            return GenericRestApiResponse.success(iLinksService.add(ld));
         } catch (Exception e) {
             if (log.isInfoEnabled()) {
                 log.error("Add Links failure", e);
             }
-
-            return GenericRestApiResponse.fail(VenusRestApiCode.VENUS_ADMIN_EXCEPTION, VenusRestApiCode.VENUS_ADMIN_EXCEPTION.message());
+            Throwable cause = e.getCause();
+            String error = null;
+            if (cause != null) {
+                error = cause.getMessage();
+            }
+            return GenericRestApiResponse.fail(VenusRestApiCode.VENUS_ADMIN_EXCEPTION, error == null ? e.getMessage(): error);
         }
     }
 
@@ -112,16 +125,20 @@ public class LinksRestController {
      * @return a GenericRestApiResponse indicating the success or failure of the update operation
      */
     @PostMapping("/update")
-    public GenericRestApiResponse<Long> update(@RequestBody @Validated LinksRequest request) {
+    public GenericRestApiResponse<Boolean> update(@RequestBody @Validated LinksRequest request) {
         try {
             LinksDao ld = LinksDao.fromEntity(request);
-            iLinksService.update(ld);
-            return GenericRestApiResponse.success(ld.getId());
+            return GenericRestApiResponse.success(iLinksService.update(ld));
         } catch (Exception e) {
             if (log.isInfoEnabled()) {
                 log.error("Update Links failure", e);
             }
-            return GenericRestApiResponse.fail(VenusRestApiCode.VENUS_ADMIN_EXCEPTION, VenusRestApiCode.VENUS_ADMIN_EXCEPTION.message());
+            Throwable cause = e.getCause();
+            String error = null;
+            if (cause != null) {
+                error = cause.getMessage();
+            }
+            return GenericRestApiResponse.fail(VenusRestApiCode.VENUS_ADMIN_EXCEPTION, error == null ? e.getMessage(): error);
         }
     }
 
@@ -134,19 +151,23 @@ public class LinksRestController {
      *         Returns success if the deletion is successful, otherwise returns a failure response.
      */
     @DeleteMapping("/delete/{id}")
-    public GenericRestApiResponse<Long> delete(@PathVariable
+    public GenericRestApiResponse<Boolean> delete(@PathVariable
                                                @Validated
                                                @NotNull
                                                @Min(0)
                                                @Max(Long.MAX_VALUE) long id) {
         try {
-            iLinksService.delete(id);
-            return GenericRestApiResponse.success(id);
+            return GenericRestApiResponse.success(iLinksService.delete(id));
         } catch (Exception e) {
             if (log.isErrorEnabled()) {
                 log.error("Delete links[id:{}] failure", id, e);
             }
-            return GenericRestApiResponse.fail(VenusRestApiCode.VENUS_ADMIN_EXCEPTION, VenusRestApiCode.VENUS_ADMIN_EXCEPTION.message());
+            Throwable cause = e.getCause();
+            String error = null;
+            if (cause != null) {
+                error = cause.getMessage();
+            }
+            return GenericRestApiResponse.fail(VenusRestApiCode.VENUS_ADMIN_EXCEPTION, error == null ? e.getMessage(): error);
         }
     }
 }

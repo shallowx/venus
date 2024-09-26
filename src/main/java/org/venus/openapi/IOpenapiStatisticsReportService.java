@@ -5,9 +5,10 @@ package org.venus.openapi;
  */
 public interface IOpenapiStatisticsReportService {
     /**
-     * Reports the OpenAPI statistics.
+     * Reports the OpenAPI statistics based on the provided entity.
      *
-     * @param entity the OpenapiStatisticsEntity containing the details of the statistics to be reported
+     * @param entity the OpenapiStatisticsEntity containing the statistics information to be reported
+     * @return true if the reporting was successful, false otherwise
      */
-    void report(OpenapiStatisticsEntity entity);
+    boolean report(OpenapiStatisticsEntity entity);
 }
