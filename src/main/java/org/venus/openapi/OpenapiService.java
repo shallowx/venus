@@ -13,6 +13,8 @@ import org.venus.cache.*;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.*;
@@ -99,22 +101,26 @@ public class OpenapiService implements IOpenapiService, Callback {
         this.properties = properties;
         this.redisTemplate = redisTemplate;
         this.alarm = provider.getIfAvailable();
-
         this.checkMultiLevelCacheIsConsistent();
     }
 
     /**
-     * Initializes the Venus Redis configuration. This method ensures that the Redis cache is populated with necessary
-     * data from the database upon the application's startup. If the Redis configuration has already been initialized,
-     * it avoids reloading the initialization data multiple times, particularly in cases of restarts or expansions.
+     * Initializes the application state by loading necessary data into Redis cache from the database
+     * and setting up appropriate keys for the caching mechanism.
      *
-     * If the Redis configuration has not been initialized:
-     * - Logs a warning if initialization is not needed.
-     * - Attempts to set a unique initialization key in Redis to prevent multiple initializations.
-     * - Retrieves a list of entities from the OpenAPI repository and populates the cache with these entities.
-     * - Catches and logs any exception that occurs during the caching process.
+     * The method performs the following steps:
      *
-     * The method includes safety checks and logging to ensure traceability and error tracking during the initialization process.
+     * 1. Checks whether the properties have been initialized.
+     * 2. Prevents multiple loads of initialization data by setting a unique key in Redis.
+     * 3. Loads entities from the database if the key is successfully set.
+     * 4. Populates the cache with either:
+     *    a. A shuffled subset of active, valid entities if no hot redirect keys are provided.
+     *    b. A filtered list of entities matching the hot redirect keys.
+     *
+     * Logs warnings if initialization conditions are not met or if the data set from the database is empty.
+     * Logs errors if there's an exception during the cache population process.
+     *
+     * This method is marked with {@code @PostConstruct}, ensuring it's executed once the bean's properties have been initialized.
      */
     @PostConstruct
     public void init() {
@@ -145,12 +151,32 @@ public class OpenapiService implements IOpenapiService, Callback {
         }
 
         Cache cache = manager.getCache(VENUS_REDIRECT_CACHE_NAME);
-        for (OpenapiEntity entity : entities) {
-            try {
-                cache.put(entity.getCode(), entity);
-            } catch (Exception e) {
-                if (log.isErrorEnabled()) {
-                    log.error("Venus redis key[{}] initialize was failure with entity[{}]", entity.getCode(), entity, e);
+        List<String> hotRedirectKeys = properties.getHotRedirectKeys();
+        if (hotRedirectKeys == null || hotRedirectKeys.isEmpty()) {
+            Collections.shuffle(entities);
+            List<OpenapiEntity> activeEntities = entities.stream().filter(e -> {
+                short isActive = e.getIsActive();
+                LocalDateTime expiresAt = e.getExpiresAt();
+                return OpenapiRedirectStatusEnum.ACTIVE == OpenapiRedirectStatusEnum.of(isActive) && expiresAt.isAfter(LocalDateTime.now());
+            }).toList().subList(0, Math.min(properties.getMaxRandomRedirectKeys(), entities.size()));
+            activeEntities.forEach(e -> cache.put(e.getCode(), e));
+        } else {
+            for (OpenapiEntity entity : entities) {
+                String key = entity.getCode();
+                short isActive = entity.getIsActive();
+                LocalDateTime expiresAt = entity.getExpiresAt();
+
+                if (OpenapiRedirectStatusEnum.UN_ACTIVE == OpenapiRedirectStatusEnum.of(isActive) || expiresAt.isBefore(LocalDateTime.now())) {
+                    continue;
+                }
+                try {
+                    if (hotRedirectKeys.contains(key)) {
+                        cache.put(entity.getCode(), entity);
+                    }
+                } catch (Exception e) {
+                    if (log.isErrorEnabled()) {
+                        log.error("Venus redis key[{}] initialize was failure with entity[{}]", entity.getCode(), entity, e);
+                    }
                 }
             }
         }
@@ -184,10 +210,12 @@ public class OpenapiService implements IOpenapiService, Callback {
     }
 
     /**
-     * Redirects to an OpenapiEntity based on the given encode parameter.
+     * Redirects to an {@link OpenapiEntity} based on the provided encode string.
+     * This method checks the cache for the entity and verifies its active status
+     * and expiry before returning it.
      *
-     * @param encode the encoded string used to lookup the OpenapiEntity.
-     * @return the OpenapiEntity if found and is active and not expired, otherwise null.
+     * @param encode The encoded string used to look up the OpenapiEntity.
+     * @return The OpenapiEntity if found, active, and not expired; otherwise, returns null.
      */
     @VenusMultiLevelCache(cacheName = VENUS_REDIRECT_CACHE_NAME, key = "#encode", type = MultiLevelCacheType.ALL)
     @Override
@@ -352,25 +380,26 @@ public class OpenapiService implements IOpenapiService, Callback {
         @Override
         public void run() {
             try {
-                ConcurrentMap<String, Object> values = primaryCache.asMap();
-                if (values.isEmpty()) {
+                ConcurrentMap<String, Object> primaryCacheMap = primaryCache.asMap();
+                if (primaryCacheMap.isEmpty()) {
                     if (log.isWarnEnabled()) {
                         log.warn("Primary cache is empty");
                     }
                     return;
                 }
 
-                Set<String> keySet = values.keySet();
-                List<CacheWrapper> cacheWrappers = secondCache.opsForValue().multiGet(keySet);
-                if (cacheWrappers == null || cacheWrappers.isEmpty()) {
+                Set<String> keySet = primaryCacheMap.keySet();
+                List<CacheWrapper> secondCacheWrappers = secondCache.opsForValue().multiGet(keySet);
+                if (secondCacheWrappers == null || secondCacheWrappers.isEmpty()) {
                     if (log.isDebugEnabled()) {
                         log.debug("SecondCache cache is empty");
                     }
                     return;
                 }
 
-                List<String> secondCacheKeys = cacheWrappers.stream().map(CacheWrapper::getKey).toList();
-                values.forEach((k, v) -> {
+                // if the primary-cache value is not the same as the second-cache,and then it's will update the primary-cache value from the second-cache value
+                List<String> secondCacheKeys = secondCacheWrappers.stream().map(CacheWrapper::getKey).toList();
+                primaryCacheMap.forEach((k, v) -> {
                     if (v instanceof CacheWrapper) {
                         String key = ((CacheWrapper) v).getKey();
                         Object value = ((CacheWrapper) v).getValue();
@@ -381,7 +410,7 @@ public class OpenapiService implements IOpenapiService, Callback {
                             primaryCache.invalidate(key);
                             alarm.alarm(key, value, "evict");
                         } else {
-                            for (CacheWrapper cacheWrapper : cacheWrappers) {
+                            for (CacheWrapper cacheWrapper : secondCacheWrappers) {
                                 if (key.equals(cacheWrapper.getKey()) && value.equals(cacheWrapper.getValue())) {
                                     if (log.isDebugEnabled()) {
                                         log.debug("Primary cache of key[{}] the same as the second cache", key);

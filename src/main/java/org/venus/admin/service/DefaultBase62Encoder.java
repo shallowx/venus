@@ -47,11 +47,10 @@ public class DefaultBase62Encoder implements Encoder {
      */
     @Override
     public String encode(long input) {
-        var encode = new StringBuilder();
         if (input == 0) {
             return String.valueOf(ENCODE_CHARS[0]);
         }
-
+        var encode = new StringBuilder();
         while (input > 0) {
             encode.append(ENCODE_CHARS[(int) (input % SPEED)]);
             input = input / SPEED;

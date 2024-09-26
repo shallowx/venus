@@ -15,19 +15,11 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
- * Unit tests for the VenusMultiLevelValueAdaptingCache class.
+ * Unit tests for the `VenusMultiLevelValueAdaptingCache` class.
  *
- * This class contains multiple test scenarios to validate the behavior of the
- * VenusMultiLevelValueAdaptingCache implementation. The tests cover the following scenarios:
- * - Looking up a CacheWrapper from primary cache
- * - Looking up a CacheWrapper from secondary cache when primary cache misses
- * - Lookup with no CacheWrapper in both caches
- * - Getting a value with a hit in the cache
- * - Getting a value with a miss in the cache
- * - Putting a value in the cache
- * - Putting a null value in the cache when nulls are not allowed
- * - Evicting a key from the cache
- * - Evicting with an invalid key
+ * This test class contains methods to verify the functionality and correctness of the
+ * `VenusMultiLevelValueAdaptingCache` implementation, particularly focusing on lookup,
+ * get, put, and evict operations in a multi-level caching system.
  */
 public class VenusMultiLevelValueAdaptingCacheTest {
 
@@ -60,7 +52,7 @@ public class VenusMultiLevelValueAdaptingCacheTest {
         Object result = multiLevelCache.lookup(key);
 
         assertNotNull(result);
-        assertTrue(result instanceof CacheWrapper);
+        assertInstanceOf(CacheWrapper.class, result);
         assertEquals(expectedWrapper, result);
     }
 
@@ -102,7 +94,7 @@ public class VenusMultiLevelValueAdaptingCacheTest {
         Object result = multiLevelCache.lookup(key);
 
         assertNotNull(result);
-        assertTrue(result instanceof CacheWrapper);
+        assertInstanceOf(CacheWrapper.class, result);
         assertEquals(expectedWrapper, result);
     }
 

@@ -10,6 +10,8 @@ import org.venus.admin.domain.LinksEntity;
 import org.venus.admin.repository.LinksRepository;
 import org.venus.openapi.OpenapiEntity;
 import java.util.List;
+import java.util.concurrent.*;
+
 import static org.venus.cache.VenusMultiLevelCacheConstants.VENUS_REDIRECT_CACHE_NAME;
 
 /**
@@ -35,6 +37,13 @@ public class LinksService implements ILinksService {
      */
     @Autowired
     private CacheManager cacheManager;
+
+    /**
+     * A ScheduledExecutorService designed to handle retry logic for updating the cache in case of errors.
+     * This executor uses a single virtual thread, named "retry-update-cache-with-error",
+     * to ensure retry operations are performed with minimal resource overhead.
+     */
+    private static final ScheduledThreadPoolExecutor retryUpdateCacheIfErrorExecutor = (ScheduledThreadPoolExecutor)Executors.newFixedThreadPool(1, Thread.ofVirtual().name("retry-update-cache-with-error").factory());
 
     /**
      * Retrieves a list of all link entities from the system.
@@ -65,9 +74,32 @@ public class LinksService implements ILinksService {
     @Override
     public void add(LinksDao ld) {
         linksRepository.add(ld);
-        Cache cache = cacheManager.getCache(VENUS_REDIRECT_CACHE_NAME);
-        if (cache != null) {
-            cache.put(ld.getCode(), OpenapiEntity.from(ld));
+        try {
+            Cache cache = cacheManager.getCache(VENUS_REDIRECT_CACHE_NAME);
+            if (cache != null) {
+                cache.put(ld.getCode(), OpenapiEntity.from(ld));
+            }
+        }catch (Exception e) {
+            log.error("Error while adding links to the cache", e);
+            Runnable task = () -> {
+                Cache cache = cacheManager.getCache(VENUS_REDIRECT_CACHE_NAME);
+                if (cache != null) {
+                    cache.put(ld.getCode(), OpenapiEntity.from(ld));
+                }
+            };
+            try {
+                retryUpdateCacheIfErrorExecutor.scheduleAtFixedRate(task, 0, 5000, TimeUnit.MILLISECONDS);
+            }catch (Exception ex) {
+                log.error("Error while retry adding links to the cache", ex);
+                if (!retryUpdateCacheIfErrorExecutor.isShutdown()) {
+                    // Discard previous tasks
+                    BlockingQueue<Runnable> scheduledPoolQueue = retryUpdateCacheIfErrorExecutor.getQueue();
+                    if (!scheduledPoolQueue.isEmpty()) {
+                        scheduledPoolQueue.clear();
+                    }
+                    retryUpdateCacheIfErrorExecutor.scheduleAtFixedRate(task, 0, 5000, TimeUnit.MILLISECONDS);
+                }
+            }
         }
     }
 
@@ -79,9 +111,32 @@ public class LinksService implements ILinksService {
     @Override
     public void update(LinksDao ld) {
         linksRepository.update(ld);
-        Cache cache = cacheManager.getCache(VENUS_REDIRECT_CACHE_NAME);
-        if (cache != null) {
-            cache.put(ld.getCode(), OpenapiEntity.from(ld));
+        try {
+            Cache cache = cacheManager.getCache(VENUS_REDIRECT_CACHE_NAME);
+            if (cache != null) {
+                cache.put(ld.getCode(), OpenapiEntity.from(ld));
+            }
+        } catch (Exception e) {
+            log.error("Error while updating links to the cache", e);
+            Runnable task = () -> {
+                Cache cache = cacheManager.getCache(VENUS_REDIRECT_CACHE_NAME);
+                if (cache != null) {
+                    cache.put(ld.getCode(), OpenapiEntity.from(ld));
+                }
+            };
+            try {
+                retryUpdateCacheIfErrorExecutor.scheduleAtFixedRate(task, 0, 5000, TimeUnit.MILLISECONDS);
+            }catch (Exception ex) {
+                log.error("Error while retry updating links to the cache", ex);
+                if (!retryUpdateCacheIfErrorExecutor.isShutdown()) {
+                    // Discard previous tasks
+                    BlockingQueue<Runnable> scheduledPoolQueue = retryUpdateCacheIfErrorExecutor.getQueue();
+                    if (!scheduledPoolQueue.isEmpty()) {
+                        scheduledPoolQueue.clear();
+                    }
+                    retryUpdateCacheIfErrorExecutor.scheduleAtFixedRate(task, 0, 5000, TimeUnit.MILLISECONDS);
+                }
+            }
         }
     }
 
@@ -97,9 +152,32 @@ public class LinksService implements ILinksService {
     public void delete(long id) {
         LinksEntity entity = this.get(id);
         linksRepository.remove(id);
-        Cache cache = cacheManager.getCache(VENUS_REDIRECT_CACHE_NAME);
-        if (cache != null) {
-            cache.evict(entity.getCode());
+        try {
+            Cache cache = cacheManager.getCache(VENUS_REDIRECT_CACHE_NAME);
+            if (cache != null) {
+                cache.evict(entity.getCode());
+            }
+        } catch (Exception e) {
+            log.error("Error while deleting links from the cache", e);
+            Runnable task = () -> {
+                Cache cache = cacheManager.getCache(VENUS_REDIRECT_CACHE_NAME);
+                if (cache != null) {
+                    cache.evict(entity.getCode());
+                }
+            };
+            try {
+                retryUpdateCacheIfErrorExecutor.scheduleAtFixedRate(task, 0, 5000, TimeUnit.MILLISECONDS);
+            }catch (Exception ex) {
+                log.error("Error while retry deleting links from the cache", ex);
+                if (!retryUpdateCacheIfErrorExecutor.isShutdown()) {
+                    // Discard previous tasks
+                    BlockingQueue<Runnable> scheduledPoolQueue = retryUpdateCacheIfErrorExecutor.getQueue();
+                    if (!scheduledPoolQueue.isEmpty()) {
+                        scheduledPoolQueue.clear();
+                    }
+                    retryUpdateCacheIfErrorExecutor.scheduleAtFixedRate(task, 0, 5000, TimeUnit.MILLISECONDS);
+                }
+            }
         }
     }
 }

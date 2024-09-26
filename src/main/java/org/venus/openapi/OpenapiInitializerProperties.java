@@ -4,6 +4,7 @@ import lombok.*;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import java.time.Duration;
+import java.util.List;
 
 /**
  * Configuration properties for initializing OpenAPI settings.
@@ -40,4 +41,20 @@ public class OpenapiInitializerProperties {
      * allowing specification in various time units.
      */
     private Duration initialDelay;
+    /**
+     * A list of keys used for hot redirects in the OpenAPI initializer configuration.
+     *
+     * These keys specify the parameters or identifiers that trigger dynamic redirection
+     * behavior in the OpenAPI initialization process.
+     */
+    private List<String> hotRedirectKeys;
+
+    /**
+     * Maximum number of random redirect keys used when hot redirect keys are not set.
+     *
+     * This variable specifies the upper limit for generating random keys used in the
+     * redirection process when the predefined hot redirect keys are not configured,
+     * ensuring the redirection mechanism has a fallback to operate correctly.
+     */
+    private int maxRandomRedirectKeys = 10000;
 }

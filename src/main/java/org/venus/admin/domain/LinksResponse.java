@@ -8,20 +8,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Class representing a response object for link data.
- * It is used for transferring link details from the backend to the frontend.
- *
- * The class includes the following attributes:
- * - id: The unique identifier for the link.
- * - code: The unique code associated with the link.
- * - redirect: The redirect status of the link.
- * - originalUrl: The original URL which the link redirects to.
- * - createdAt: The timestamp indicating when the link was created.
- * - expiresAt: The timestamp indicating when the link expires.
- * - isActive: A boolean indicating whether the link is active.
- *
- * The class provides builder methods for constructing instances and static methods
- * for converting from a LinksEntity object or a list of LinksEntity objects.
+ * LinksResponse is a Data Transfer Object (DTO) representing the response format for link-related operations.
+ * This class encapsulates attributes of a link such as its ID, code, redirect status, original URL,
+ * creation timestamp, expiration timestamp, and active status.
  */
 @Data
 @AllArgsConstructor
@@ -30,23 +19,21 @@ import java.util.stream.Collectors;
 @Builder
 public class LinksResponse {
     /**
-     * The unique identifier for the link.
+     * Unique identifier for the link.
      */
     private long id;
     /**
      * The unique code associated with the link.
-     * It is used for identifying and accessing the specific link.
+     * This value is used for identifying and accessing the specific link.
      */
     private String code;
     /**
      * The redirect status of the link.
-     * This integer field typically represents a status code indicating the type of redirection.
-     * For example, it may denote HTTP status codes like 301 for permanent redirect or 302 for temporary redirect.
+     * This field indicates how the link should be redirected.
      */
     private int redirect;
     /**
-     * The original URL which the link redirects to.
-     * This field must be unique and can have a maximum length of 500 characters.
+     * The original URL associated with the link.
      */
     private String originalUrl;
     /**
@@ -54,21 +41,21 @@ public class LinksResponse {
      */
     private LocalDateTime createdAt;
     /**
-     * The timestamp indicating when the link expires.
-     * This field is used to determine the expiration date and time of the link.
+     * The date and time when the link expires.
+     * This value is used to determine the validity period of the link.
      */
     private LocalDateTime expiresAt;
     /**
-     * A boolean indicating whether the link is active.
-     * This flag determines if the associated link should be considered active.
+     * Indicates whether the link is currently active.
+     * A value of true means the link is active, while false means it is inactive.
      */
     private boolean isActive;
 
     /**
-     * Converts a LinksEntity object to a LinksResponse object.
+     * Converts a given LinksEntity object to a LinksResponse object.
      *
-     * @param links The LinksEntity object to be converted.
-     * @return A new LinksResponse object with values copied from the provided LinksEntity.
+     * @param links the LinksEntity object to be converted
+     * @return a LinksResponse object representing the given LinksEntity
      */
     public static LinksResponse from(LinksEntity links) {
         return LinksResponse.builder()
@@ -83,10 +70,10 @@ public class LinksResponse {
     }
 
     /**
-     * Converts a list of LinksEntity objects into a list of LinksResponse objects.
+     * Converts a list of LinksEntity objects to a list of LinksResponse objects.
      *
-     * @param links the list of LinksEntity objects to be converted.
-     * @return a list of LinksResponse objects; an empty list if the input is null or empty.
+     * @param links the list of LinksEntity objects to be converted
+     * @return a list of LinksResponse objects representing the given LinksEntity objects
      */
     public static List<LinksResponse> from(List<LinksEntity> links) {
         if (links == null || links.isEmpty()) {
