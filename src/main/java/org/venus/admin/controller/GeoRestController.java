@@ -16,7 +16,7 @@ import org.venus.support.VenusRestApiCode;
  * REST controller for handling geographical data.
  */
 @RestController
-@RequestMapping("/geo")
+@RequestMapping("/api/v1/geo")
 @Slf4j
 public class GeoRestController {
 

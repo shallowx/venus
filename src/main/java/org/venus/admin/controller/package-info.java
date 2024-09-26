@@ -3,5 +3,5 @@
 @ReturnValuesAreNonnullByDefault
 package org.venus.admin.controller;
 
-import org.venus.admin.annotations.ParametersAreNonnullByDefault;
-import org.venus.admin.annotations.ReturnValuesAreNonnullByDefault;
+import org.venus.admin.annotation.ParametersAreNonnullByDefault;
+import org.venus.admin.annotation.ReturnValuesAreNonnullByDefault;

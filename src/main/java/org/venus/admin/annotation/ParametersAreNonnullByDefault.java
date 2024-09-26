@@ -1,4 +1,4 @@
-package org.venus.admin.annotations;
+package org.venus.admin.annotation;
 
 import java.lang.annotation.*;
 

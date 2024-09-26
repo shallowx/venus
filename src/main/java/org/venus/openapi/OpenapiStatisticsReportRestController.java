@@ -17,7 +17,7 @@ import org.venus.support.VenusRestApiCode;
  * An instance of IOpenapiStatisticsReportService is used to process the reporting logic.
  */
 @RestController
-@RequestMapping("/openapi/statistics")
+@RequestMapping("/openapi/v1/statistics")
 @Slf4j
 public class OpenapiStatisticsReportRestController {
 

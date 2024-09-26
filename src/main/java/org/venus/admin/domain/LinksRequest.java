@@ -9,7 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.hibernate.validator.constraints.Length;
-import org.venus.admin.annotations.FutureDate;
+import org.venus.admin.annotation.FutureDate;
 
 /**
  * This class represents a request model for managing links.

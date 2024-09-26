@@ -21,7 +21,7 @@ import org.venus.support.VenusRestApiCode;
  * - `@Slf4j`: Lombok annotation for logging.
  */
 @RestController
-@RequestMapping("/openapi/geo")
+@RequestMapping("/openapi/v1/geo")
 @Slf4j
 public class OpenapiGeoReportRestController {
 

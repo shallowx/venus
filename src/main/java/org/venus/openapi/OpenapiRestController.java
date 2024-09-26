@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.venus.metrics.MetricsConstants;
 import org.venus.support.GenericListRestApiResponse;
 import org.venus.support.GenericRestApiResponse;
 import org.venus.support.VenusRestApiCode;
@@ -29,7 +30,7 @@ import java.util.concurrent.Executors;
  * redirecting URLs while also tracking request and redirect metrics.
  */
 @RestController
-@RequestMapping("/openapi")
+@RequestMapping("/openapi/v1")
 @Slf4j
 public class OpenapiRestController {
 
@@ -50,13 +51,13 @@ public class OpenapiRestController {
      * The value "302" indicates that the requested resource resides temporarily
      * under a different URI and the user agent should perform a temporary redirect.
      */
-    private static final String REDIRECT_302 = "302";
+    private static final short REDIRECT_302 = 302;
     /**
      * A constant representing the HTTP status code for "Moved Permanently".
      * This status code indicates that the requested resource has been
      * permanently moved to a new URL.
      */
-    private static final String REDIRECT_301 = "301";
+    private static final short REDIRECT_301 = 301;
 
     /**
      * A static and final instance of {@code MeterRegistry} that is initialized with
@@ -145,14 +146,14 @@ public class OpenapiRestController {
         }
 
         int redirect = entity.getRedirect();
-        if (String.valueOf(redirect).equals(REDIRECT_301)) {
+        if (redirect == REDIRECT_301) {
             submit(encode, "http_redirect_301", entity.getOriginalUrl());
             return ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY)
                     .location(URI.create(entity.getOriginalUrl()))
                     .build();
         }
 
-        if (String.valueOf(redirect).equals(REDIRECT_302)) {
+        if (redirect == REDIRECT_302) {
             submit(encode, "http_redirect_302", entity.getOriginalUrl());
             return ResponseEntity.status(HttpStatus.FOUND)
                     .location(URI.create(entity.getOriginalUrl()))
@@ -163,8 +164,13 @@ public class OpenapiRestController {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
 
+
     /**
+     * Submits a task to the executor that performs HTTP request and redirect counting.
      *
+     * @param encode The encoding to be used.
+     * @param name The name associated with the task.
+     * @param url The URL to be accessed.
      */
     private void submit(String encode, String name, String url) {
         executor.submit(() -> {
@@ -184,8 +190,8 @@ public class OpenapiRestController {
         if (counter == null) {
             counter = requestCounter.computeIfAbsent(key,
                     s -> Counter.builder("http_redirect_request_total_count")
-                            .tags(Tags.of("application", "venus")
-                                    .and(Tags.of("version", "1.0.0"))
+                            .tags(Tags.of(MetricsConstants.TYPE_APPLICATION_NAME, MetricsConstants.DEFAULT_APPLICATION_NAME)
+                                    .and(Tags.of(MetricsConstants.TYPE_VERSION, MetricsConstants.DEFAULT_APPLICATION_VERSION))
                             ).register(registry));
         }
         counter.increment();
@@ -206,9 +212,9 @@ public class OpenapiRestController {
             counter = redirects.computeIfAbsent(key,
                     s -> Counter.builder(name)
                             .tags(Tags.of("encode", key)
-                                    .and(Tags.of("application", "venus"))
-                                    .and(Tags.of("version", "1.0.0"))
-                                    .and(Tags.of("original", original))
+                                    .and(Tags.of(MetricsConstants.TYPE_APPLICATION_NAME, MetricsConstants.DEFAULT_APPLICATION_NAME))
+                                    .and(Tags.of(MetricsConstants.TYPE_VERSION, MetricsConstants.DEFAULT_APPLICATION_VERSION))
+                                    .and(Tags.of(MetricsConstants.TYPE_ORIGIN, original))
                             ).register(registry));
         }
         counter.increment();

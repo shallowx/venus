@@ -1,4 +1,4 @@
-package org.venus.admin.annotations;
+package org.venus.admin.annotation;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
@@ -21,7 +21,7 @@ import java.lang.annotation.Target;
  * @return the payload associated with the constraint
  */
 @Constraint(validatedBy = FutureDateValidator.class)
-@Target({ElementType.FIELD, ElementType.PARAMETER})
+@Target({ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface FutureDate {
     /**

@@ -1,5 +1,6 @@
 package org.venus.support;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.io.Serial;
@@ -26,15 +27,17 @@ public abstract class AbstractRestApiResponse<T> implements Serializable {
     private static final long serialVersionUID = -7090019282307269743L;
 
     /**
-     *
+     * Indicates whether the API request was successful.
      */
     protected boolean success;
     /**
-     * A variable for storing a message in the API response.
+     * A message providing additional information about the response, typically used to convey
+     * errors, warnings, or other pertinent details regarding the success or failure of the request.
      */
     protected String message;
     /**
-     * An integer representing the response code of the API request, indicating the specific outcome or status of the request.
+     * The response code indicating the specific status or outcome of the API call.
+     * This is typically an HTTP status code or a custom code defined by the application.
      */
     protected int code;
 }

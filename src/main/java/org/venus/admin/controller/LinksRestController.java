@@ -7,7 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.venus.admin.annotations.RestApiList;
+import org.venus.admin.annotation.RestApiList;
 import org.venus.admin.domain.LinksDao;
 import org.venus.admin.domain.LinksRequest;
 import org.venus.admin.domain.LinksResponse;
@@ -22,7 +22,7 @@ import org.venus.support.VenusRestApiCode;
  * adding new links, updating existing links, and deleting links.
  */
 @RestController
-@RequestMapping(value = "/links")
+@RequestMapping(value = "/api/v1/links")
 @Slf4j
 public class LinksRestController {
 
@@ -100,7 +100,7 @@ public class LinksRestController {
      * @param request  the LinksRequest object containing the details of the link to be added
      * @return a GenericRestApiResponse object indicating the success or failure of the operation
      */
-    @PostMapping("/add")
+    @PostMapping("/create")
     public GenericRestApiResponse<Boolean> add(@RequestBody @Validated LinksRequest request) {
         try {
             LinksDao ld = LinksDao.fromEntity(request);
