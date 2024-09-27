@@ -2,8 +2,9 @@
 
 ## Venus
 
-URL Shortener System: supports large-scale clusters
+URL Shortener System
 
+- Supports large-scale clusters
 - System support multi-level cache ensure venus performance by itself
 - The function of the 'admin(package)' is to provide web management UI support
 - The function of the 'openapi(package)' is to provide third-party queries, redirect and data analysis reports
