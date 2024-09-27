@@ -152,6 +152,6 @@ public class RestApiControllerAdvice {
         if (log.isErrorEnabled()) {
             log.error("path:{} - bad request", request.getRequestURL(), e);
         }
-        return GenericRestApiResponse.fail(VenusRestApiCode.BAD_REQUEST, VenusRestApiCode.BAD_REQUEST.message());
+        return GenericRestApiResponse.fail(VenusRestApiCode.BAD_REQUEST, VenusRestApiCode.BAD_REQUEST.message(e.getMessage()));
     }
 }

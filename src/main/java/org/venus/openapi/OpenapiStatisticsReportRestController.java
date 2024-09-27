@@ -48,7 +48,7 @@ public class OpenapiStatisticsReportRestController {
             if (log.isErrorEnabled()) {
                 log.error("Openapi report statistics data failure");
             }
-            return GenericRestApiResponse.fail(VenusRestApiCode.OPENAPI_EXCEPTION, VenusRestApiCode.OPENAPI_EXCEPTION.message());
+            return GenericRestApiResponse.fail(VenusRestApiCode.OPENAPI_STATISTICS_EXCEPTION, VenusRestApiCode.OPENAPI_STATISTICS_EXCEPTION.message("Openapi report statistics data failure \n" + e.getMessage()));
         }
     }
 }

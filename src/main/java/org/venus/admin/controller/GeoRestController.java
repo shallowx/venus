@@ -45,14 +45,9 @@ public class GeoRestController {
             );
         } catch (Exception e) {
             if (log.isErrorEnabled()) {
-                log.error("Error listing links", e);
+                log.error("Error listing geo", e);
             }
-            String error = null;
-            Throwable cause = e.getCause();
-            if (cause != null) {
-                error = cause.getMessage();
-            }
-            return GenericListRestApiResponse.fail(VenusRestApiCode.VENUS_ADMIN_EXCEPTION, error == null ? e.getMessage(): error);
+            return GenericListRestApiResponse.fail(VenusRestApiCode.VENUS_ADMIN_GEO_EXCEPTION, VenusRestApiCode.VENUS_ADMIN_GEO_EXCEPTION.message("Listing geo failed \n" + e.getMessage()));
         }
     }
 
@@ -73,12 +68,7 @@ public class GeoRestController {
             if (log.isErrorEnabled()) {
                 log.error("Error get geo's detail", e);
             }
-            String error = null;
-            Throwable cause = e.getCause();
-            if (cause != null) {
-                error = cause.getMessage();
-            }
-            return GenericRestApiResponse.fail(VenusRestApiCode.VENUS_ADMIN_EXCEPTION, error == null ? e.getMessage(): error);
+            return GenericRestApiResponse.fail(VenusRestApiCode.VENUS_ADMIN_GEO_EXCEPTION, VenusRestApiCode.VENUS_ADMIN_GEO_EXCEPTION.message("Get geo details \n" + e.getMessage()));
         }
     }
 }

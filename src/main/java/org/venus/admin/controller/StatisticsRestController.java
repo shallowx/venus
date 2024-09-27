@@ -45,12 +45,7 @@ public class StatisticsRestController {
             if (log.isErrorEnabled()) {
                 log.error("Error listing statistics", e);
             }
-            String error = null;
-            Throwable cause = e.getCause();
-            if (cause != null) {
-                error = cause.getMessage();
-            }
-            return GenericListRestApiResponse.fail(VenusRestApiCode.VENUS_ADMIN_EXCEPTION, error == null ? e.getMessage(): error);
+            return GenericListRestApiResponse.fail(VenusRestApiCode.VENUS_ADMIN_STATISTICS_EXCEPTION, VenusRestApiCode.VENUS_ADMIN_STATISTICS_EXCEPTION.message("Listing statistics failed \n" + e.getMessage()));
         }
     }
 
@@ -70,12 +65,7 @@ public class StatisticsRestController {
             if (log.isErrorEnabled()) {
                 log.error("Error get statistics detail", e);
             }
-            String error = null;
-            Throwable cause = e.getCause();
-            if (cause != null) {
-                error = cause.getMessage();
-            }
-            return GenericRestApiResponse.fail(VenusRestApiCode.VENUS_ADMIN_EXCEPTION, error == null ? e.getMessage(): error);
+            return GenericRestApiResponse.fail(VenusRestApiCode.VENUS_ADMIN_STATISTICS_EXCEPTION, VenusRestApiCode.VENUS_ADMIN_STATISTICS_EXCEPTION.message("Get statistics detail failed \n" + e.getMessage()));
         }
     }
 }

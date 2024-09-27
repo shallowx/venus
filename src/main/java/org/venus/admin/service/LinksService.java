@@ -45,7 +45,7 @@ public class LinksService implements ILinksService {
      * This executor uses a single virtual thread, named "retry-update-cache-with-error",
      * to ensure retry operations are performed with minimal resource overhead.
      */
-    private static final ScheduledThreadPoolExecutor retryUpdateCacheIfErrorExecutor = (ScheduledThreadPoolExecutor)Executors.newFixedThreadPool(1, Thread.ofVirtual().name("retry-update-cache-with-error").factory());
+    private static final ScheduledThreadPoolExecutor retryUpdateCacheIfErrorExecutor = (ScheduledThreadPoolExecutor)Executors.newScheduledThreadPool(1, Thread.ofVirtual().name("retry-update-cache-with-error").factory());
 
     /**
      * Retrieves a list of all link entities from the system.

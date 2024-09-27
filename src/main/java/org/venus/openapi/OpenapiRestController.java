@@ -120,7 +120,7 @@ public class OpenapiRestController {
             if (log.isErrorEnabled()) {
                 log.error("Get venus openapi original-url and url-encode mapping entity failure", e);
             }
-            return GenericRestApiResponse.fail(VenusRestApiCode.OPENAPI_EXCEPTION, VenusRestApiCode.OPENAPI_EXCEPTION.message());
+            return GenericRestApiResponse.fail(VenusRestApiCode.OPENAPI_EXCEPTION, VenusRestApiCode.OPENAPI_EXCEPTION.message("Get venus openapi original-url and url-encode mapping entity failure \n" + e.getMessage()));
         }
     }
 
@@ -138,9 +138,9 @@ public class OpenapiRestController {
             ));
         } catch (Exception e) {
             if (log.isErrorEnabled()) {
-                log.error("Get venus openapi original-url and url-encode mapping entity failure", e);
+                log.error("List venus openapi redirect uri failure", e);
             }
-            return GenericListRestApiResponse.fail(VenusRestApiCode.OPENAPI_EXCEPTION, VenusRestApiCode.OPENAPI_EXCEPTION.message());
+            return GenericListRestApiResponse.fail(VenusRestApiCode.OPENAPI_EXCEPTION, VenusRestApiCode.OPENAPI_EXCEPTION.message("List venus openapi redirect uri failure \n" + e.getMessage()));
         }
     }
 
@@ -156,7 +156,7 @@ public class OpenapiRestController {
              OpenapiEntity entity = iOpenapiService.redirect(encode);
              if (entity == null) {
                  submit(encode, "http_redirect_unknown_url", "unknown");
-                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+                 return ResponseEntity.status(HttpStatus.NOT_FOUND).location(URI.create(errorUri)).build();
              }
 
              int redirect = entity.getRedirect();
@@ -175,7 +175,7 @@ public class OpenapiRestController {
              }
 
              submit(encode, "http_redirect_unknown_status", entity.getOriginalUrl());
-             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+             return ResponseEntity.status(HttpStatus.NOT_FOUND).location(URI.create(errorUri)).build();
          } catch (Exception e) {
              if (log.isErrorEnabled()) {
                  log.error("Get venus openapi redirect failure, and will redirect the default error uri[{}]", errorUri, e);

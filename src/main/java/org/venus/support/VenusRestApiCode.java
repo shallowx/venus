@@ -33,14 +33,54 @@ public enum VenusRestApiCode {
      */
     BAD_REQUEST(400, "venus bad request"),
     /**
-     * VENUS_ADMIN_EXCEPTION indicates an administrative-related exception within the Venus REST API.
-     * This custom status code (10001) helps identify issues specific to administrative operations.
+     * Constant that represents a specific error condition with the VENUS admin.
+     * Used for error handling to signify an error code related to admin operations in the VENUS system.
+     *
+     * Error Code: 10001
+     * Description: "venus admin error"
      */
     VENUS_ADMIN_EXCEPTION(10001, "venus admin error"),
     /**
-     * Indicates an OpenAPI-related exception, with a custom code 20001.
+     * VENUS_ADMIN_GEO_EXCEPTION error code and message.
+     *
+     * This constant represents an error specifically related to geographic
+     * issues within the VENUS administrative system.
+     *
+     * Error Code: 10002
+     * Message: "venus geo error"
      */
-    OPENAPI_EXCEPTION(20001, "venus openapi error");
+    VENUS_ADMIN_GEO_EXCEPTION(10002, "venus geo error"),
+    /**
+     * A constant representing a specific exception case for the Venus admin link.
+     * The error code is 10003 and the associated message is "venus link error".
+     */
+    VENUS_ADMIN_LINK_EXCEPTION(10003, "venus link error"),
+    /**
+     * The constant VENUS_ADMIN_STATISTICS_EXCEPTION signifies an error specific to Venus statistics functionality.
+     * This error is identified by the code 10004 and is described by the message "venus statistics error".
+     */
+    VENUS_ADMIN_STATISTICS_EXCEPTION(10004, "venus statistics error"),
+    /**
+     * A constant representing the OpenAPI exception.
+     *
+     * Error Code: 20001
+     *
+     * Description: "venus openapi error"
+     */
+    OPENAPI_EXCEPTION(20001, "venus openapi error"),
+    /**
+     * This constant represents an error code and message specific to mapping errors
+     * encountered in the Venus OpenAPI platform.
+     *
+     * Error Code: 20002
+     * Error Message: "venus openapi mapping error"
+     */
+    OPENAPI_GEO_EXCEPTION(20002, "venus openapi mapping error"),
+    /**
+     * Error code and message indicating an issue with the Venus OpenAPI list.
+     * The error code is 20003 and the message is "venus openapi list error".
+     */
+    OPENAPI_STATISTICS_EXCEPTION(20003, "venus openapi list error");
 
     /**
      * Represents the integer code associated with the Venus REST API status.
@@ -76,6 +116,10 @@ public enum VenusRestApiCode {
      *
      * @return the message associated with the enum constant
      */
+    public String message(String error) {
+        return String.format("%s: %s", message, error);
+    }
+
     public String message() {
         return message;
     }

@@ -53,12 +53,7 @@ public class LinksRestController {
             if (log.isErrorEnabled()) {
                 log.error("Error listing links", e);
             }
-            Throwable cause = e.getCause();
-            String error = null;
-            if (cause != null) {
-                error = cause.getMessage();
-            }
-            return GenericListRestApiResponse.fail(VenusRestApiCode.VENUS_ADMIN_EXCEPTION, error == null ? e.getMessage(): error);
+            return GenericListRestApiResponse.fail(VenusRestApiCode.VENUS_ADMIN_LINK_EXCEPTION, VenusRestApiCode.VENUS_ADMIN_LINK_EXCEPTION.message("Links links failed \n" + e.getMessage()));
         }
     }
 
@@ -85,12 +80,7 @@ public class LinksRestController {
             if (log.isErrorEnabled()) {
                 log.error("Error get link's detail", e);
             }
-            Throwable cause = e.getCause();
-            String error = null;
-            if (cause != null) {
-                error = cause.getMessage();
-            }
-            return GenericRestApiResponse.fail(VenusRestApiCode.VENUS_ADMIN_EXCEPTION, error == null ? e.getMessage(): error);
+            return GenericRestApiResponse.fail(VenusRestApiCode.VENUS_ADMIN_LINK_EXCEPTION, VenusRestApiCode.VENUS_ADMIN_LINK_EXCEPTION.message("Get links details failed \n" + e.getMessage()));
         }
     }
 
@@ -107,14 +97,9 @@ public class LinksRestController {
             return GenericRestApiResponse.success(iLinksService.add(ld));
         } catch (Exception e) {
             if (log.isInfoEnabled()) {
-                log.error("Add Links failure", e);
+                log.error("Create Links failure", e);
             }
-            Throwable cause = e.getCause();
-            String error = null;
-            if (cause != null) {
-                error = cause.getMessage();
-            }
-            return GenericRestApiResponse.fail(VenusRestApiCode.VENUS_ADMIN_EXCEPTION, error == null ? e.getMessage(): error);
+            return GenericRestApiResponse.fail(VenusRestApiCode.VENUS_ADMIN_LINK_EXCEPTION, VenusRestApiCode.VENUS_ADMIN_LINK_EXCEPTION.message("Create links failed \n" + e.getMessage()));
         }
     }
 
@@ -133,12 +118,7 @@ public class LinksRestController {
             if (log.isInfoEnabled()) {
                 log.error("Update Links failure", e);
             }
-            Throwable cause = e.getCause();
-            String error = null;
-            if (cause != null) {
-                error = cause.getMessage();
-            }
-            return GenericRestApiResponse.fail(VenusRestApiCode.VENUS_ADMIN_EXCEPTION, error == null ? e.getMessage(): error);
+            return GenericRestApiResponse.fail(VenusRestApiCode.VENUS_ADMIN_LINK_EXCEPTION, VenusRestApiCode.VENUS_ADMIN_LINK_EXCEPTION.message("Update links failed \n" + e.getMessage()));
         }
     }
 
@@ -162,12 +142,8 @@ public class LinksRestController {
             if (log.isErrorEnabled()) {
                 log.error("Delete links[id:{}] failure", id, e);
             }
-            Throwable cause = e.getCause();
-            String error = null;
-            if (cause != null) {
-                error = cause.getMessage();
-            }
-            return GenericRestApiResponse.fail(VenusRestApiCode.VENUS_ADMIN_EXCEPTION, error == null ? e.getMessage(): error);
+
+            return GenericRestApiResponse.fail(VenusRestApiCode.VENUS_ADMIN_LINK_EXCEPTION, VenusRestApiCode.VENUS_ADMIN_LINK_EXCEPTION.message("Delete links failed \n" + e.getMessage()));
         }
     }
 }
