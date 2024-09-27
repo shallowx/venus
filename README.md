@@ -15,7 +15,8 @@ URL Shortener System
 
 - Core redirect function implementation
 
-### Stress testing environment
+### Stress testing report
+#### testing environment
 
 - Mac Pro (12C 16G)
 - VM: 12G(heap) +UseZGC
@@ -82,7 +83,9 @@ summary =10926237 in 00:05:00 =36379.7/s  Avg:20 Min:0 Max:267 Err:0(0.00%)
 
 ## Metrics
 
-> http://127.0.0.1:18029/venus/actuator
+```shell
+ http://127.0.0.1:18029/venus/actuator
+```
 
 ## Links
 
