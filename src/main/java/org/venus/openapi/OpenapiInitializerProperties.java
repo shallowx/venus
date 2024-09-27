@@ -57,4 +57,13 @@ public class OpenapiInitializerProperties {
      * ensuring the redirection mechanism has a fallback to operate correctly.
      */
     private int maxRandomRedirectKeys = 10000;
+
+    /**
+     * The default URL to redirect to in case of errors or unspecified scenarios.
+     *
+     * This variable holds the URL that the system will use for redirecting users
+     * when a specific redirect URL is not provided or an error occurs. It helps
+     * in managing fallback redirection within the OpenAPI initialization process.
+     */
+    private String defaultRedirectUrl = "http://127.0.0.1:8029/error";
 }

@@ -2,7 +2,7 @@ package org.venus.admin.domain;
 
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
-import org.venus.admin.service.DefaultBase62Encoder;
+import org.venus.support.VenusBase62Encoder;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -73,7 +73,7 @@ public class LinksDao {
             if (log.isInfoEnabled()) {
                 log.info("Links URl mapping code: {}", mappingCode);
             }
-            mappingCode = DefaultBase62Encoder.INSTANCE.encode(request.getId());
+            mappingCode = VenusBase62Encoder.INSTANCE.encode(request.getId());
         }
 
         return LinksDao.builder()

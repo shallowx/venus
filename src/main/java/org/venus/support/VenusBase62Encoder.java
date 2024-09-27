@@ -1,6 +1,7 @@
-package org.venus.admin.service;
+package org.venus.support;
 
 import lombok.extern.slf4j.Slf4j;
+import org.venus.admin.service.Encoder;
 
 /**
  * DefaultBase62Encoder is an implementation of the Encoder interface that provides
@@ -11,7 +12,7 @@ import lombok.extern.slf4j.Slf4j;
  * into a base62 string representation.
  */
 @Slf4j
-public class DefaultBase62Encoder implements Encoder {
+public class VenusBase62Encoder implements Encoder {
     /**
      * Singleton instance of DefaultBase62Encoder.
      *
@@ -19,7 +20,17 @@ public class DefaultBase62Encoder implements Encoder {
      * the predefined base62 characters [0-9], [a-z], and [A-Z]. It ensures a single,
      * globally accessible instance of the encoder.
      */
-    public static final DefaultBase62Encoder INSTANCE = new DefaultBase62Encoder();
+    public static final VenusBase62Encoder INSTANCE = new VenusBase62Encoder();
+
+    /**
+     * Creates a private constructor for the DefaultBase62Encoder class.
+     *
+     * This constructor is private to enforce the singleton pattern, ensuring that only one
+     * instance of DefaultBase62Encoder can be created. It restricts instantiation from
+     * outside the class, allowing only the provided static instance to be used.
+     */
+    private VenusBase62Encoder() {
+    }
 
     /**
      * ENCODE_CHARS is a character array containing the predefined set of
@@ -38,12 +49,21 @@ public class DefaultBase62Encoder implements Encoder {
      * which includes characters used for base62 encoding.
      */
     private static final int SPEED = ENCODE_CHARS.length;
+    /**
+     * A bitmask that is derived from the number of available encoded characters.
+     * This mask is used for bitwise operations during encoding processes.
+     * The value is calculated as {@code SPEED} minus one, where {@code SPEED} represents
+     * the total number of characters used for base62 encoding.
+     */
+    private static final int MASK = SPEED - 1;
 
     /**
-     * Encodes a given long input into a base62 string representation.
+     * Encodes a given long value into a base62 encoded string.
+     * This method converts the input long value into a string
+     * representation using base62 characters (0-9, a-z, A-Z).
      *
-     * @param input the long value to be encoded.
-     * @return the base62 encoded string representation of the input.
+     * @param input The long value to be encoded.
+     * @return A base62 encoded string representing the input value.
      */
     @Override
     public String encode(long input) {
@@ -52,8 +72,8 @@ public class DefaultBase62Encoder implements Encoder {
         }
         var encode = new StringBuilder();
         while (input > 0) {
-            encode.append(ENCODE_CHARS[(int) (input % SPEED)]);
-            input = input / SPEED;
+            encode.append(ENCODE_CHARS[(int) (input & MASK)]);
+            input >>= 6;
         }
         return encode.reverse().toString();
     }

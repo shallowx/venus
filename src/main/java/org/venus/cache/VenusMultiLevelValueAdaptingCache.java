@@ -26,7 +26,7 @@ import static org.venus.cache.VenusMultiLevelCacheConstants.DEFAULT_LISTENER_NAM
  * from the primary (in-memory) cache and, if not found, retrieving it from the secondary (Redis) cache.
  */
 @Slf4j
-public class VenusMultiLevelValueAdaptingCache extends AbstractValueAdaptingCache implements CacheSelector{
+public class VenusMultiLevelValueAdaptingCache extends AbstractValueAdaptingCache implements CacheSelector {
     /**
      * Represents the name of the cache.
      * This variable holds the identifier used for the cache.

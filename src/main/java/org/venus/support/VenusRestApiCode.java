@@ -36,11 +36,11 @@ public enum VenusRestApiCode {
      * VENUS_ADMIN_EXCEPTION indicates an administrative-related exception within the Venus REST API.
      * This custom status code (10001) helps identify issues specific to administrative operations.
      */
-    VENUS_ADMIN_EXCEPTION(10001, "venus admin exception"),
+    VENUS_ADMIN_EXCEPTION(10001, "venus admin error"),
     /**
      * Indicates an OpenAPI-related exception, with a custom code 20001.
      */
-    OPENAPI_EXCEPTION(20001, "venus openapi exception");
+    OPENAPI_EXCEPTION(20001, "venus openapi error");
 
     /**
      * Represents the integer code associated with the Venus REST API status.

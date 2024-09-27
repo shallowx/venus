@@ -51,7 +51,7 @@ public class OpenapiGeoReportRestController {
             if (log.isErrorEnabled()) {
                 log.error("Openapi report geo data failure");
             }
-            return GenericRestApiResponse.fail(VenusRestApiCode.FAILURE, VenusRestApiCode.FAILURE.message());
+            return GenericRestApiResponse.fail(VenusRestApiCode.OPENAPI_EXCEPTION, VenusRestApiCode.OPENAPI_EXCEPTION.message());
         }
     }
 }

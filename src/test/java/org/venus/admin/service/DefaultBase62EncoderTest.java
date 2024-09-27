@@ -1,6 +1,8 @@
 package org.venus.admin.service;
 
 import org.junit.jupiter.api.Test;
+import org.venus.support.VenusBase62Encoder;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
@@ -10,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class DefaultBase62EncoderTest {
 
     // Instance of class to test
-    private DefaultBase62Encoder encoder = DefaultBase62Encoder.INSTANCE;
+    private VenusBase62Encoder encoder = VenusBase62Encoder.INSTANCE;
 
     @Test
     public void testEncodeWithZeroInput() {

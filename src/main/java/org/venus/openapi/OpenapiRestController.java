@@ -44,8 +44,21 @@ public class OpenapiRestController {
      * of this service is injected at runtime, facilitating dependency
      * management and promoting loose coupling within the application.
      */
+    private final IOpenapiService iOpenapiService;
+    private final String errorUri;
+
+    /**
+     * Constructor for OpenapiRestController.
+     *
+     * @param iOpenapiService the OpenAPI service instance used for handling business logic
+     * @param properties      the properties configuration object containing default settings
+     */
     @Autowired
-    private IOpenapiService iOpenapiService;
+    public OpenapiRestController(IOpenapiService iOpenapiService, OpenapiInitializerProperties properties) {
+        this.iOpenapiService = iOpenapiService;
+        this.errorUri = properties.getDefaultRedirectUrl();
+    }
+
     /**
      * A constant representing the HTTP status code for a temporary redirect.
      * The value "302" indicates that the requested resource resides temporarily
@@ -107,7 +120,7 @@ public class OpenapiRestController {
             if (log.isErrorEnabled()) {
                 log.error("Get venus openapi original-url and url-encode mapping entity failure", e);
             }
-            return GenericRestApiResponse.fail(VenusRestApiCode.VENUS_ADMIN_EXCEPTION, VenusRestApiCode.VENUS_ADMIN_EXCEPTION.message());
+            return GenericRestApiResponse.fail(VenusRestApiCode.OPENAPI_EXCEPTION, VenusRestApiCode.OPENAPI_EXCEPTION.message());
         }
     }
 
@@ -127,7 +140,7 @@ public class OpenapiRestController {
             if (log.isErrorEnabled()) {
                 log.error("Get venus openapi original-url and url-encode mapping entity failure", e);
             }
-            return GenericListRestApiResponse.fail(VenusRestApiCode.VENUS_ADMIN_EXCEPTION, VenusRestApiCode.VENUS_ADMIN_EXCEPTION.message());
+            return GenericListRestApiResponse.fail(VenusRestApiCode.OPENAPI_EXCEPTION, VenusRestApiCode.OPENAPI_EXCEPTION.message());
         }
     }
 
@@ -139,31 +152,48 @@ public class OpenapiRestController {
      */
     @GetMapping("/redirect")
     public ResponseEntity<Void> redirect(@RequestParam @NotEmpty @Validated String encode) {
-        OpenapiEntity entity = iOpenapiService.redirect(encode);
-        if (entity == null) {
-            submit(encode, "http_redirect_unknown_url", "unknown");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        }
+         try {
+             OpenapiEntity entity = iOpenapiService.redirect(encode);
+             if (entity == null) {
+                 submit(encode, "http_redirect_unknown_url", "unknown");
+                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+             }
 
-        int redirect = entity.getRedirect();
-        if (redirect == REDIRECT_301) {
-            submit(encode, "http_redirect_301", entity.getOriginalUrl());
-            return ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY)
-                    .location(URI.create(entity.getOriginalUrl()))
-                    .build();
-        }
+             int redirect = entity.getRedirect();
+             if (redirect == REDIRECT_301) {
+                 submit(encode, "http_redirect_301", entity.getOriginalUrl());
+                 return ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY)
+                         .location(URI.create(entity.getOriginalUrl()))
+                         .build();
+             }
 
-        if (redirect == REDIRECT_302) {
-            submit(encode, "http_redirect_302", entity.getOriginalUrl());
-            return ResponseEntity.status(HttpStatus.FOUND)
-                    .location(URI.create(entity.getOriginalUrl()))
-                    .build();
-        }
+             if (redirect == REDIRECT_302) {
+                 submit(encode, "http_redirect_302", entity.getOriginalUrl());
+                 return ResponseEntity.status(HttpStatus.FOUND)
+                         .location(URI.create(entity.getOriginalUrl()))
+                         .build();
+             }
 
-        submit(encode, "http_redirect_unknown_status", entity.getOriginalUrl());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+             submit(encode, "http_redirect_unknown_status", entity.getOriginalUrl());
+             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+         } catch (Exception e) {
+             if (log.isErrorEnabled()) {
+                 log.error("Get venus openapi redirect failure, and will redirect the default error uri[{}]", errorUri, e);
+             }
+             submit(encode, "http_redirect_default_error_uri", errorUri);
+             return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).location(URI.create(errorUri)).build();
+         }
     }
 
+    /**
+     * Handles error requests and returns an error message view.
+     *
+     * @return a string indicating the view name for error handling
+     */
+    @GetMapping("/error")
+    public String error() {
+        return "error/503: please check the logs for more information";
+    }
 
     /**
      * Submits a task to the executor that performs HTTP request and redirect counting.
