@@ -16,13 +16,13 @@ URL Shortener System: supports large-scale clusters
 
 ### Stress testing environment
 
-- Mac Pro(12C16G)
-- VM: 12G(heap)、+UseZGC
+- Mac Pro (12C 16G)
+- VM: 12G(heap) +UseZGC
 - Loop Count: Infinite
 - specify thread lifetime duration(s): 300
 - number of thread(users): 1000
 
-performance-report
+#### performance report
 
 ```java
 summary +557742   in 00:00:16 =35466.2/s  Avg:14 Min:0 Max:142 Err:0(0.00%) Active:1000 Started:1000 Finished:0
@@ -47,25 +47,41 @@ summary =10395725 in 00:04:46 =36371.2/s  Avg:20 Min:0 Max:267 Err:0(0.00%)
 summary +530512   in 00:00:15 =36549.2/s  Avg:20 Min:0 Max:192 Err:0(0.00%) Active:0    Started:1000 Finished:1000
 summary =10926237 in 00:05:00 =36379.7/s  Avg:20 Min:0 Max:267 Err:0(0.00%)
 ```
-
 ## Quickly Start
+| name  | version |
+|-------|---------|
+| Java  | 21      |
+| MySQL | 8.x     |
+| Redis | Latest  |
+
 - Start MYSQL
 - Start Redis
 - Check the system setting(application.properties)
 
 ### Application
-- Start ```org.venus.VenusApplication```
-- Add URL mapping, see ```org.venus.admin.controller.LinksRestController#add()```
+- Start the main class
+  ```java 
+  org.venus.VenusApplication#main()
+  ```
+- Add the URL mapping, please see the  
+  ```java 
+  org.venus.admin.controller.LinksRestController#add()
+  ```
 
 ### Docker
-- Add URL mapping, see ```org.venus.admin.controller.LinksRestController#add()```
+- Add the URL mapping, please see 
+  ```java 
+  org.venus.admin.controller.LinksRestController#add()
+  ```
 - Ensure the JVM stack startup parameters in the script (run.sh) can be start service. Since the default is 12G, the container may have insufficient memory, causing the startup to fail
-- ```docker build -t venus .```
-- ```docker run --name venus -p 8029:8029 venus```
+```shell
+  docker build -t venus .
+  docker run --name venus -p 8029:8029 venus
+  ```
 
 ## Metrics
 
-- see```http://${host}/18029/venus/actuator```
+> http://127.0.0.1:18029/venus/actuator
 
 ## Links
 
