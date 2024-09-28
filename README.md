@@ -75,7 +75,7 @@ summary =10926237 in 00:05:00 =36379.7/s  Avg:20 Min:0 Max:267 Err:0(0.00%)
   ```java 
   org.venus.admin.controller.LinksRestController#add()
   ```
-- Ensure the JVM stack startup parameters in the script (run.sh) can be start service. Since the default is 12G, the container may have insufficient memory, causing the startup to fail
+- Ensure the JVM startup parameters in the script (run.sh) can be start service. Since the default is 12G, the container may have insufficient memory, causing the startup to fail
 ```shell
   docker build -t venus .
   docker run --name venus -p 8029:8029 venus
