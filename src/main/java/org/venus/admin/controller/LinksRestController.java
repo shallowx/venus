@@ -22,7 +22,7 @@ import org.venus.support.VenusRestApiCode;
  * adding new links, updating existing links, and deleting links.
  */
 @RestController
-@RequestMapping(value = "/api/v1/links")
+@RequestMapping(value = "/v1/links")
 @Slf4j
 public class LinksRestController {
 

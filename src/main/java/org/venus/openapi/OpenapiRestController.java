@@ -30,7 +30,7 @@ import java.util.concurrent.Executors;
  * redirecting URLs while also tracking request and redirect metrics.
  */
 @RestController
-@RequestMapping("/openapi/v1")
+@RequestMapping("/v1/openapi")
 @Slf4j
 public class OpenapiRestController {
 

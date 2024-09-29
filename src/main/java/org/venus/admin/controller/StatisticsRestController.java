@@ -16,7 +16,7 @@ import org.venus.support.VenusRestApiCode;
  * REST controller for handling statistics-related endpoints.
  */
 @RestController
-@RequestMapping(value = "/api/v1/statistics")
+@RequestMapping(value = "/v1/statistics")
 @Slf4j
 public class StatisticsRestController {
 
