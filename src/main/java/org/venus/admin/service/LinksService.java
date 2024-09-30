@@ -116,11 +116,6 @@ public class LinksService implements ILinksService {
             }catch (Exception ex) {
                 log.error("Error while retry adding links to the cache", ex);
                 if (!retryUpdateCacheIfErrorExecutor.isShutdown()) {
-                    // Discard previous tasks
-                    BlockingQueue<Runnable> scheduledPoolQueue = retryUpdateCacheIfErrorExecutor.getQueue();
-                    if (!scheduledPoolQueue.isEmpty()) {
-                        scheduledPoolQueue.clear();
-                    }
                     retryUpdateCacheIfErrorExecutor.scheduleAtFixedRate(task, 0, 5000, TimeUnit.MILLISECONDS);
                 }
             }
@@ -171,11 +166,6 @@ public class LinksService implements ILinksService {
             }catch (Exception ex) {
                 log.error("Error while retry updating links to the cache", ex);
                 if (!retryUpdateCacheIfErrorExecutor.isShutdown()) {
-                    // Discard previous tasks
-                    BlockingQueue<Runnable> scheduledPoolQueue = retryUpdateCacheIfErrorExecutor.getQueue();
-                    if (!scheduledPoolQueue.isEmpty()) {
-                        scheduledPoolQueue.clear();
-                    }
                     retryUpdateCacheIfErrorExecutor.scheduleAtFixedRate(task, 0, 5000, TimeUnit.MILLISECONDS);
                 }
             }
@@ -212,11 +202,6 @@ public class LinksService implements ILinksService {
             }catch (Exception ex) {
                 log.error("Error while retry deleting links from the cache", ex);
                 if (!retryUpdateCacheIfErrorExecutor.isShutdown()) {
-                    // Discard previous tasks
-                    BlockingQueue<Runnable> scheduledPoolQueue = retryUpdateCacheIfErrorExecutor.getQueue();
-                    if (!scheduledPoolQueue.isEmpty()) {
-                        scheduledPoolQueue.clear();
-                    }
                     retryUpdateCacheIfErrorExecutor.scheduleAtFixedRate(task, 0, 5000, TimeUnit.MILLISECONDS);
                 }
             }

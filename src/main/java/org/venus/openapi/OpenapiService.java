@@ -317,11 +317,6 @@ public class OpenapiService implements IOpenapiService, Callback {
                 log.error("Venus check cache consistent failure", e);
             }
             if (!scheduledPool.isShutdown()) {
-                // Discard previous tasks
-                BlockingQueue<Runnable> scheduledPoolQueue = scheduledPool.getQueue();
-                if (!scheduledPoolQueue.isEmpty()) {
-                    scheduledPoolQueue.clear();
-                }
                 scheduledPool.scheduleAtFixedRate(consistentTask, properties.getInitialDelay().toMillis(), properties.getCheckPrimaryCachePeriod().toMillis(), TimeUnit.MILLISECONDS);
             } else {
                 if (log.isWarnEnabled()) {
