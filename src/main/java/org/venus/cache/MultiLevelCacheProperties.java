@@ -39,13 +39,6 @@ public class MultiLevelCacheProperties {
      */
     private long expireAfterAccess;
     /**
-     * Specifies the expiration time for cached items in Redis in milliseconds.
-     *
-     * This value determines how long an item remains in the Redis cache before
-     * it is considered expired and eligible for removal.
-     */
-    private long redisExpires;
-    /**
      * Defines the count of redis keys to be scanned in a single iteration.
      * This value is used to control the breadth and performance of scan operations
      * within a Redis database, allowing for optimized memory and processing efficiency.

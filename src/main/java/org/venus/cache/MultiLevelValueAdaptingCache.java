@@ -175,21 +175,15 @@ public class MultiLevelValueAdaptingCache extends AbstractValueAdaptingCache imp
         // Allows storage of NULL values, which in some cases can avoid problems such as cache penetration
         if (!isAllowNullValues() && value == null) {
             if (log.isWarnEnabled()) {
-                log.warn("The key[{}] of value NULL will not be cached", key);
+                log.warn("The key[{}] of value 'NULL' will not be cached", key);
             }
             return;
         }
         primaryCache.put((String) key, new CacheWrapper((String) key, value));
 
         String redisKey = buildKey(key);
-        Optional<Long> expireOpt = Optional.ofNullable(properties)
-                .map(MultiLevelCacheProperties::getRedisExpires);
-        if (expireOpt.isPresent()) {
-            secondCache.opsForValue().set(redisKey, new CacheWrapper(redisKey, value), expireOpt.get(), TimeUnit.MILLISECONDS);
-        } else {
-            secondCache.opsForValue().set(redisKey, new CacheWrapper(redisKey, value));
-        }
-
+        // the second cache is not permits the key-value expire
+        secondCache.opsForValue().set(redisKey, new CacheWrapper(redisKey, value));
         try {
             CacheListenerMessage cacheMassage = CacheListenerMessage.builder()
                     .name(this.cacheName)
