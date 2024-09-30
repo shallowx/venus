@@ -7,7 +7,7 @@ package org.venus.cache;
  * This class contains constants for default names associated with various
  * components within the Venus caching infrastructure.
  */
-public final class VenusMultiLevelCacheConstants {
+public final class MultiLevelCacheConstants {
     /**
      * Represents the default name assigned to the listener within the
      * Venus multi-tier caching system.

@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Configuration;
  * to set up and initialize the VenusInitializer.
  */
 @Configuration(proxyBeanMethods = false)
-public class VenusInitializerAutoConfiguration {
+public class InitializerAutoConfiguration {
     /**
      * Creates a VenusInitializer bean with the specified ApplicationContext.
      * The VenusInitializer is responsible for initializing the web application context
@@ -21,7 +21,7 @@ public class VenusInitializerAutoConfiguration {
      * @return a new instance of VenusInitializer initialized with the given ApplicationContext
      */
     @Bean(initMethod = "init")
-    public VenusInitializer venusInitializer(ApplicationContext context) {
-        return new VenusInitializer(context);
+    public Initializer venusInitializer(ApplicationContext context) {
+        return new Initializer(context);
     }
 }

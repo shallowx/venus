@@ -11,7 +11,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @Getter
 @Setter
 @ConfigurationProperties(prefix = "spring.venus.multi.level.cache")
-public class VenusMultiLevelCacheProperties {
+public class MultiLevelCacheProperties {
     /**
      * Determines whether null values are allowed in the cache.
      * When true, the cache can store null values. When false, null values are not permitted.

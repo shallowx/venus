@@ -23,11 +23,10 @@ import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
-import org.springframework.util.StringUtils;
 
 import java.lang.reflect.Method;
 
-import static org.venus.cache.VenusMultiLevelCacheConstants.DEFAULT_LISTENER_NAME;
+import static org.venus.cache.MultiLevelCacheConstants.DEFAULT_LISTENER_NAME;
 
 /**
  * Auto-configuration class for Venus Multi-Level Cache.
@@ -35,8 +34,8 @@ import static org.venus.cache.VenusMultiLevelCacheConstants.DEFAULT_LISTENER_NAM
  */
 @AutoConfigureOrder(Ordered.LOWEST_PRECEDENCE)
 @Configuration(proxyBeanMethods = false)
-@EnableConfigurationProperties(VenusMultiLevelCacheProperties.class)
-public class VenusMultiLevelCacheAutoConfiguration {
+@EnableConfigurationProperties(MultiLevelCacheProperties.class)
+public class MultiLevelCacheAutoConfiguration {
 
     @Configuration(proxyBeanMethods = false)
     static class VenusMultiLevelCacheRedisAutoConfiguration {
@@ -90,17 +89,17 @@ public class VenusMultiLevelCacheAutoConfiguration {
      * @param properties the properties used to configure the multi-level caching system
      * @return an instance of VenusMultiLevelCacheManager configured with the specified properties and template
      */
-    @ConditionalOnBean(VenusInitializer.class)
+    @ConditionalOnBean(Initializer.class)
     @DependsOn("venusInitializer")
     @Bean
-    public VenusMultiLevelCacheManager venusMultiLevelCacheManager(RedisTemplate<String, CacheWrapper> template, VenusMultiLevelCacheProperties properties) {
-        return new VenusMultiLevelCacheManager(properties, template);
+    public MultiLevelCacheManager venusMultiLevelCacheManager(RedisTemplate<String, CacheWrapper> template, MultiLevelCacheProperties properties) {
+        return new MultiLevelCacheManager(properties, template);
     }
 
     @Configuration(proxyBeanMethods = false)
     static class MessageListenerAutoConfiguration {
         @Bean
-        public RedisMessageReceiver redisMessageReceiver(VenusMultiLevelCacheManager manager, RedisTemplate<String, CacheListenerMessage> template) {
+        public RedisMessageReceiver redisMessageReceiver(MultiLevelCacheManager manager, RedisTemplate<String, CacheListenerMessage> template) {
             return new RedisMessageReceiver(template, manager);
         }
 
@@ -157,7 +156,7 @@ public class VenusMultiLevelCacheAutoConfiguration {
      * @return A new MultiLevelCacheAspect instance configured with the specified manager and callback.
      */
     @Bean
-    public MultiLevelCacheAspect multiLevelCacheAspect(VenusMultiLevelCacheManager manager, @Autowired Callback callback) {
+    public MultiLevelCacheAspect multiLevelCacheAspect(MultiLevelCacheManager manager, @Autowired Callback callback) {
         return new MultiLevelCacheAspect(manager, callback);
     }
 }

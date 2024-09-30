@@ -40,10 +40,10 @@ public class VenusMultiLevelValueAdaptingCacheTest {
         String key = "key1";
         Cache<String, Object> primaryCache = Mockito.mock(Cache.class);
         RedisTemplate<String, CacheWrapper> secondCache = Mockito.mock(RedisTemplate.class);
-        VenusMultiLevelCacheProperties properties = new VenusMultiLevelCacheProperties();
+        MultiLevelCacheProperties properties = new MultiLevelCacheProperties();
         properties.setAllowNull(true);
-        VenusMultiLevelValueAdaptingCache multiLevelCache =
-                new VenusMultiLevelValueAdaptingCache("testCache", secondCache, primaryCache, properties);
+        MultiLevelValueAdaptingCache multiLevelCache =
+                new MultiLevelValueAdaptingCache("testCache", secondCache, primaryCache, properties);
         CacheWrapper expectedWrapper = new CacheWrapper((String) key, "Value");
 
         // Mock primaryCache to return the CacheWrapper
@@ -79,10 +79,10 @@ public class VenusMultiLevelValueAdaptingCacheTest {
         String key = "key1";
         Cache<String, Object> primaryCache = Mockito.mock(Cache.class);
         RedisTemplate<String, CacheWrapper> secondCache = Mockito.mock(RedisTemplate.class);
-        VenusMultiLevelCacheProperties properties = new VenusMultiLevelCacheProperties();
+        MultiLevelCacheProperties properties = new MultiLevelCacheProperties();
         properties.setAllowNull(true);
-        VenusMultiLevelValueAdaptingCache multiLevelCache =
-                new VenusMultiLevelValueAdaptingCache("testCache", secondCache, primaryCache, properties);
+        MultiLevelValueAdaptingCache multiLevelCache =
+                new MultiLevelValueAdaptingCache("testCache", secondCache, primaryCache, properties);
         CacheWrapper expectedWrapper = new CacheWrapper(key, "Value");
 
         // Mock primaryCache to return null and secondCache to return the CacheWrapper
@@ -119,10 +119,10 @@ public class VenusMultiLevelValueAdaptingCacheTest {
         String key = "key1";
         Cache<String, Object> primaryCache = Mockito.mock(Cache.class);
         RedisTemplate<String, CacheWrapper> secondCache = Mockito.mock(RedisTemplate.class);
-        VenusMultiLevelCacheProperties properties = new VenusMultiLevelCacheProperties();
+        MultiLevelCacheProperties properties = new MultiLevelCacheProperties();
         properties.setAllowNull(true);
-        VenusMultiLevelValueAdaptingCache multiLevelCache =
-                new VenusMultiLevelValueAdaptingCache("testCache", secondCache, primaryCache, properties);
+        MultiLevelValueAdaptingCache multiLevelCache =
+                new MultiLevelValueAdaptingCache("testCache", secondCache, primaryCache, properties);
 
         // Mock primaryCache and secondCache to return null
         doReturn(null).when(primaryCache).getIfPresent(any());
@@ -149,9 +149,9 @@ public class VenusMultiLevelValueAdaptingCacheTest {
         String value = "value1";
         Cache<String, Object> primaryCache = Mockito.mock(Cache.class);
         RedisTemplate<String, CacheWrapper> secondCache = Mockito.mock(RedisTemplate.class);
-        VenusMultiLevelCacheProperties properties = new VenusMultiLevelCacheProperties();
+        MultiLevelCacheProperties properties = new MultiLevelCacheProperties();
         properties.setAllowNull(true);
-        VenusMultiLevelValueAdaptingCache multiLevelCache = new VenusMultiLevelValueAdaptingCache("testCache", secondCache, primaryCache, properties);
+        MultiLevelValueAdaptingCache multiLevelCache = new MultiLevelValueAdaptingCache("testCache", secondCache, primaryCache, properties);
         Callable<String> valueLoader = () -> value;
 
         // Mocking to return a CacheWrapper with the expected value
@@ -177,9 +177,9 @@ public class VenusMultiLevelValueAdaptingCacheTest {
         String value = "value1";
         Cache<String, Object> primaryCache = Mockito.mock(Cache.class);
         RedisTemplate<String, CacheWrapper> secondCache = Mockito.mock(RedisTemplate.class);
-        VenusMultiLevelCacheProperties properties = new VenusMultiLevelCacheProperties();
+        MultiLevelCacheProperties properties = new MultiLevelCacheProperties();
         properties.setAllowNull(true);
-        VenusMultiLevelValueAdaptingCache multiLevelCache = new VenusMultiLevelValueAdaptingCache("testCache", secondCache, primaryCache, properties);
+        MultiLevelValueAdaptingCache multiLevelCache = new MultiLevelValueAdaptingCache("testCache", secondCache, primaryCache, properties);
         Callable<String> valueLoader = () -> value;
 
         // Mocking to return null indicating a cache miss
@@ -217,9 +217,9 @@ public class VenusMultiLevelValueAdaptingCacheTest {
         String value = "value1";
         Cache<String, Object> primaryCache = Mockito.mock(Cache.class);
         RedisTemplate<String, CacheWrapper> secondCache = Mockito.mock(RedisTemplate.class);
-        VenusMultiLevelCacheProperties properties = new VenusMultiLevelCacheProperties();
+        MultiLevelCacheProperties properties = new MultiLevelCacheProperties();
         properties.setAllowNull(true);
-        VenusMultiLevelValueAdaptingCache multiLevelCache = new VenusMultiLevelValueAdaptingCache("testCache", secondCache, primaryCache, properties);
+        MultiLevelValueAdaptingCache multiLevelCache = new MultiLevelValueAdaptingCache("testCache", secondCache, primaryCache, properties);
 
         ValueOperations<String, CacheWrapper> valueOperations = Mockito.mock(ValueOperations.class);
         doReturn(valueOperations).when(secondCache).opsForValue();
@@ -246,10 +246,10 @@ public class VenusMultiLevelValueAdaptingCacheTest {
         String value = null;
         Cache<String, Object> primaryCache = Mockito.mock(Cache.class);
         RedisTemplate<String, CacheWrapper> secondCache = Mockito.mock(RedisTemplate.class);
-        VenusMultiLevelCacheProperties properties = new VenusMultiLevelCacheProperties();
+        MultiLevelCacheProperties properties = new MultiLevelCacheProperties();
         properties.setAllowNull(false);
-        VenusMultiLevelValueAdaptingCache multiLevelCache =
-                new VenusMultiLevelValueAdaptingCache("testCache", secondCache, primaryCache, properties);
+        MultiLevelValueAdaptingCache multiLevelCache =
+                new MultiLevelValueAdaptingCache("testCache", secondCache, primaryCache, properties);
 
         ValueOperations valueOperations = Mockito.mock(ValueOperations.class);
         doReturn(valueOperations).when(secondCache).opsForValue();
@@ -275,10 +275,10 @@ public class VenusMultiLevelValueAdaptingCacheTest {
         String key = "key1";
         Cache<String, Object> primaryCache = Mockito.mock(Cache.class);
         RedisTemplate<String, CacheWrapper> secondCache = Mockito.mock(RedisTemplate.class);
-        VenusMultiLevelCacheProperties properties = new VenusMultiLevelCacheProperties();
+        MultiLevelCacheProperties properties = new MultiLevelCacheProperties();
         properties.setAllowNull(true);
-        VenusMultiLevelValueAdaptingCache multiLevelCache =
-                new VenusMultiLevelValueAdaptingCache("testCache", secondCache, primaryCache, properties);
+        MultiLevelValueAdaptingCache multiLevelCache =
+                new MultiLevelValueAdaptingCache("testCache", secondCache, primaryCache, properties);
 
         Environment environment = mock(Environment.class);
         ListenerSourceSupport.initialize(environment);
@@ -303,10 +303,10 @@ public class VenusMultiLevelValueAdaptingCacheTest {
         String key = "key2";
         Cache<String, Object> primaryCache = Mockito.mock(Cache.class);
         RedisTemplate<String, CacheWrapper> secondCache = Mockito.mock(RedisTemplate.class);
-        VenusMultiLevelCacheProperties properties = new VenusMultiLevelCacheProperties();
+        MultiLevelCacheProperties properties = new MultiLevelCacheProperties();
         properties.setAllowNull(true);
-        VenusMultiLevelValueAdaptingCache multiLevelCache =
-                new VenusMultiLevelValueAdaptingCache("testCache", secondCache, primaryCache, properties);
+        MultiLevelValueAdaptingCache multiLevelCache =
+                new MultiLevelValueAdaptingCache("testCache", secondCache, primaryCache, properties);
 
         multiLevelCache.evict(key);
         // Verify that evict method was executed on primary cache

@@ -2,7 +2,6 @@ package org.venus.cache;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.support.AbstractValueAdaptingCache;
 import org.springframework.data.redis.core.RedisTemplate;
 
 import java.net.UnknownHostException;
@@ -29,7 +28,7 @@ public class RedisMessageReceiver {
      * such as local (Caffeine) and remote (Redis) caches. It helps in maintaining cache consistency
      * and performing update and invalidation operations as needed.
      */
-    private final VenusMultiLevelCacheManager manager;
+    private final MultiLevelCacheManager manager;
 
     /**
      * Constructor for RedisMessageReceiver.
@@ -39,7 +38,7 @@ public class RedisMessageReceiver {
      * @param redisTemplate the RedisTemplate used for message deserialization
      * @param manager the VenusMultiLevelCacheManager used to manage cache operations
      */
-    public RedisMessageReceiver(RedisTemplate<String, CacheListenerMessage> redisTemplate, VenusMultiLevelCacheManager manager) {
+    public RedisMessageReceiver(RedisTemplate<String, CacheListenerMessage> redisTemplate, MultiLevelCacheManager manager) {
         this.redisTemplate = redisTemplate;
         this.manager = manager;
     }
@@ -72,7 +71,7 @@ public class RedisMessageReceiver {
             return;
         }
 
-        CacheSelector selector = (VenusMultiLevelValueAdaptingCache) manager.getCache(clm.getName());
+        CacheSelector selector = (MultiLevelValueAdaptingCache) manager.getCache(clm.getName());
         Cache<String, Object> primaryCache = selector.primaryCache();
         if (clm.getType() == CacheMessageListenerType.UPDATE) {
             primaryCache.put(clm.getKey(), new CacheWrapper(clm.getKey(), clm.getValue()));

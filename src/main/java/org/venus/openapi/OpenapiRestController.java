@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.venus.cache.ValueWrapper;
 import org.venus.metrics.MetricsConstants;
 import org.venus.support.GenericListRestApiResponse;
 import org.venus.support.GenericRestApiResponse;
@@ -153,28 +154,28 @@ public class OpenapiRestController {
     @GetMapping("/redirect")
     public ResponseEntity<Void> redirect(@RequestParam @NotEmpty @Validated String encode) {
          try {
-             OpenapiEntity entity = iOpenapiService.redirect(encode);
-             if (entity == null) {
+             ValueWrapper wrapper = iOpenapiService.redirect(encode);
+             if (wrapper == null) {
                  submit(encode, "http_redirect_unknown_url", "unknown");
                  return ResponseEntity.status(HttpStatus.NOT_FOUND).location(URI.create(errorUri)).build();
              }
 
-             int redirect = entity.getRedirect();
+             int redirect = wrapper.getRedirect();
              if (redirect == REDIRECT_301) {
-                 submit(encode, "http_redirect_301", entity.getOriginalUrl());
+                 submit(encode, "http_redirect_301", wrapper.getOriginalUrl());
                  return ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY)
-                         .location(URI.create(entity.getOriginalUrl()))
+                         .location(URI.create(wrapper.getOriginalUrl()))
                          .build();
              }
 
              if (redirect == REDIRECT_302) {
-                 submit(encode, "http_redirect_302", entity.getOriginalUrl());
+                 submit(encode, "http_redirect_302", wrapper.getOriginalUrl());
                  return ResponseEntity.status(HttpStatus.FOUND)
-                         .location(URI.create(entity.getOriginalUrl()))
+                         .location(URI.create(wrapper.getOriginalUrl()))
                          .build();
              }
 
-             submit(encode, "http_redirect_unknown_status", entity.getOriginalUrl());
+             submit(encode, "http_redirect_unknown_status", wrapper.getOriginalUrl());
              return ResponseEntity.status(HttpStatus.NOT_FOUND).location(URI.create(errorUri)).build();
          } catch (Exception e) {
              if (log.isErrorEnabled()) {

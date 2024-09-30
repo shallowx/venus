@@ -1,6 +1,7 @@
 package org.venus.openapi;
 
 import lombok.*;
+import org.venus.cache.ValueWrapper;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -61,7 +62,7 @@ public class OpenapiResponse {
      * @param entity The OpenapiEntity object to convert.
      * @return An OpenapiResponse object containing the data from the provided entity.
      */
-    public static OpenapiResponse from(OpenapiEntity entity) {
+    public static OpenapiResponse from(ValueWrapper entity) {
         return OpenapiResponse.builder()
                 .code(entity.getCode())
                 .originalUrl(entity.getOriginalUrl())
@@ -81,7 +82,7 @@ public class OpenapiResponse {
      * @param entities List of OpenapiEntity objects to be converted.
      * @return A list of OpenapiResponse objects.
      */
-    public static List<OpenapiResponse> from(List<OpenapiEntity> entities) {
+    public static List<OpenapiResponse> from(List<ValueWrapper> entities) {
         if (entities == null || entities.isEmpty()) {
             return Collections.emptyList();
         }

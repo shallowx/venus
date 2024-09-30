@@ -1,4 +1,4 @@
 org.venus.openapi.OpenapiReportAutoConfiguration
-org.venus.cache.VenusInitializerAutoConfiguration
-org.venus.cache.VenusMultiLevelCacheAutoConfiguration
+org.venus.cache.InitializerAutoConfiguration
+org.venus.cache.MultiLevelCacheAutoConfiguration
 org.venus.metrics.MetricsPrometheusAutoConfiguration

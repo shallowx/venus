@@ -13,15 +13,14 @@ import org.venus.cache.*;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
-import static org.venus.cache.VenusMultiLevelCacheConstants.VENUS_REDIRECT_CACHE_NAME;
-import static org.venus.cache.VenusMultiLevelCacheConstants.VENUS_CACHE_CALLBACK_NAME;
+import static org.venus.cache.MultiLevelCacheConstants.VENUS_REDIRECT_CACHE_NAME;
+import static org.venus.cache.MultiLevelCacheConstants.VENUS_CACHE_CALLBACK_NAME;
 
 /**
  * OpenapiService is responsible for managing OpenAPI specifications,
@@ -48,7 +47,7 @@ public class OpenapiService implements IOpenapiService, Callback {
      * indicating that it can only be accessed within the enclosing class
      * and that its reference cannot be changed once initialized.
      */
-    private final VenusMultiLevelCacheManager manager;
+    private final MultiLevelCacheManager manager;
     /**
      * Represents an instance of the OpenapiCacheConsistentAlarm.
      * This variable is used to manage and initiate alarms related to cache consistency in the OpenAPI.
@@ -94,7 +93,7 @@ public class OpenapiService implements IOpenapiService, Callback {
      * @param redisTemplate the Redis template for cache operations
      */
     @Autowired
-    public OpenapiService(OpenapiRepository openapiRepository, VenusMultiLevelCacheManager manager, OpenapiInitializerProperties properties,
+    public OpenapiService(OpenapiRepository openapiRepository, MultiLevelCacheManager manager, OpenapiInitializerProperties properties,
                           ObjectProvider<OpenapiCacheConsistentAlarm> provider, RedisTemplate<String, CacheWrapper> redisTemplate) {
         this.openapiRepository = openapiRepository;
         this.manager = manager;
@@ -142,7 +141,7 @@ public class OpenapiService implements IOpenapiService, Callback {
             return;
         }
 
-        List<OpenapiEntity> entities = openapiRepository.lists();
+        List<ValueWrapper> entities = this.lists();
         if (entities == null || entities.isEmpty()) {
             if (log.isWarnEnabled()) {
                 log.warn("Venus redis initialize from db is empty");
@@ -154,28 +153,28 @@ public class OpenapiService implements IOpenapiService, Callback {
         List<String> hotRedirectKeys = properties.getHotRedirectKeys();
         if (hotRedirectKeys == null || hotRedirectKeys.isEmpty()) {
             Collections.shuffle(entities);
-            List<OpenapiEntity> activeEntities = entities.stream().filter(e -> {
+            List<ValueWrapper> activeEntities = entities.stream().filter(e -> {
                 short isActive = e.getIsActive();
                 LocalDateTime expiresAt = e.getExpiresAt();
                 return OpenapiRedirectStatusEnum.ACTIVE == OpenapiRedirectStatusEnum.of(isActive) && expiresAt.isAfter(LocalDateTime.now());
             }).toList().subList(0, Math.min(properties.getMaxRandomRedirectKeys(), entities.size()));
-            activeEntities.forEach(e -> cache.put(e.getCode(), e));
+            activeEntities.forEach(valueWrapper -> cache.put(valueWrapper.getCode(), valueWrapper));
         } else {
-            for (OpenapiEntity entity : entities) {
-                String key = entity.getCode();
-                short isActive = entity.getIsActive();
-                LocalDateTime expiresAt = entity.getExpiresAt();
+            for (ValueWrapper valueWrapper : entities) {
+                String key = valueWrapper.getCode();
+                short isActive = valueWrapper.getIsActive();
+                LocalDateTime expiresAt = valueWrapper.getExpiresAt();
 
                 if (OpenapiRedirectStatusEnum.UN_ACTIVE == OpenapiRedirectStatusEnum.of(isActive) || expiresAt.isBefore(LocalDateTime.now())) {
                     continue;
                 }
                 try {
                     if (hotRedirectKeys.contains(key)) {
-                        cache.put(entity.getCode(), entity);
+                        cache.put(valueWrapper.getCode(), valueWrapper);
                     }
                 } catch (Exception e) {
                     if (log.isErrorEnabled()) {
-                        log.error("Venus redis key[{}] initialize was failure with entity[{}]", entity.getCode(), entity, e);
+                        log.error("Venus redis key[{}] initialize was failure with entity[{}]", valueWrapper.getCode(), valueWrapper, e);
                     }
                 }
             }
@@ -188,10 +187,21 @@ public class OpenapiService implements IOpenapiService, Callback {
      * @param encode a String representing the key used to fetch the desired OpenapiEntity.
      * @return the OpenapiEntity associated with the provided encode key.
      */
-    @VenusMultiLevelCache(cacheName = VENUS_REDIRECT_CACHE_NAME, key = "#encode", type = MultiLevelCacheType.ALL)
+    @MultiLevelCache(cacheName = VENUS_REDIRECT_CACHE_NAME, key = "#encode", type = MultiLevelCacheType.ALL)
     @Override
-    public OpenapiEntity get(String encode) {
-        return openapiRepository.get(encode);
+    public ValueWrapper get(String encode) {
+        OpenapiEntity entity = openapiRepository.get(encode);
+        if (entity == null) {
+            return ValueWrapper.builder().build();
+        }
+        return ValueWrapper.builder()
+                .id(entity.getId())
+                .code(entity.getCode())
+                .originalUrl(entity.getOriginalUrl())
+                .redirect(entity.getRedirect())
+                .expiresAt(entity.getExpiresAt())
+                .isActive(entity.getIsActive())
+                .build();
     }
 
 
@@ -203,9 +213,17 @@ public class OpenapiService implements IOpenapiService, Callback {
      * @return a list of active and non-expired OpenapiEntity objects
      */
     @Override
-    public List<OpenapiEntity> lists() {
+    public List<ValueWrapper> lists() {
         return openapiRepository.lists().stream()
                 .filter(f -> f.getIsActive() != 0 && f.getExpiresAt().isAfter(LocalDateTime.now()))
+                .map(v -> ValueWrapper.builder()
+                        .id(v.getId())
+                        .code(v.getCode())
+                        .originalUrl(v.getOriginalUrl())
+                        .redirect(v.getRedirect())
+                        .expiresAt(v.getExpiresAt())
+                        .isActive(v.getIsActive())
+                        .build())
                 .collect(Collectors.toList());
     }
 
@@ -217,10 +235,10 @@ public class OpenapiService implements IOpenapiService, Callback {
      * @param encode The encoded string used to look up the OpenapiEntity.
      * @return The OpenapiEntity if found, active, and not expired; otherwise, returns null.
      */
-    @VenusMultiLevelCache(cacheName = VENUS_REDIRECT_CACHE_NAME, key = "#encode", type = MultiLevelCacheType.ALL)
+    @MultiLevelCache(cacheName = VENUS_REDIRECT_CACHE_NAME, key = "#encode", type = MultiLevelCacheType.ALL)
     @Override
-    public OpenapiEntity redirect(String encode) {
-        OpenapiEntity entity = this.get(encode);
+    public ValueWrapper redirect(String encode) {
+        ValueWrapper entity = this.get(encode);
         if (entity == null
                 || OpenapiRedirectStatusEnum.UN_ACTIVE == OpenapiRedirectStatusEnum.of(entity.getIsActive())
                 || entity.getExpiresAt().isBefore(LocalDateTime.now())) {
@@ -240,7 +258,7 @@ public class OpenapiService implements IOpenapiService, Callback {
     public void callback(String key, Object o, String type) {
         CallbackRequestEntity entity = CallbackRequestEntity.builder().key(key).o(o).type(type).build();
         try {
-            CacheSelector selector = (VenusMultiLevelValueAdaptingCache) manager.getCache(VENUS_REDIRECT_CACHE_NAME);
+            CacheSelector selector = (MultiLevelValueAdaptingCache) manager.getCache(VENUS_REDIRECT_CACHE_NAME);
             selector.secondCache().convertAndSend(VENUS_CACHE_CALLBACK_NAME, entity);
         } catch (Exception e) {
             if (log.isErrorEnabled()) {
@@ -280,7 +298,7 @@ public class OpenapiService implements IOpenapiService, Callback {
     /**
      * Ensures that the multi-level cache is consistent by periodically scheduling a consistency task.
      *
-     * This method retrieves the primary and secondary caches from a {@link VenusMultiLevelValueAdaptingCache} instance.
+     * This method retrieves the primary and secondary caches from a {@link MultiLevelValueAdaptingCache} instance.
      * It then creates a {@link ConsistentTask} which checks the consistency between the primary cache and the secondary Redis cache.
      * The task is scheduled at fixed intervals with an initial delay using a scheduled executor service.
      *
@@ -288,7 +306,7 @@ public class OpenapiService implements IOpenapiService, Callback {
      * attempting to reschedule the consistency task.
      */
     private void checkMultiLevelCacheIsConsistent() {
-        CacheSelector selector = (VenusMultiLevelValueAdaptingCache)manager.getCache(VENUS_REDIRECT_CACHE_NAME);
+        CacheSelector selector = (MultiLevelValueAdaptingCache)manager.getCache(VENUS_REDIRECT_CACHE_NAME);
         com.github.benmanes.caffeine.cache.Cache<String, Object> primaryCache = selector.primaryCache();
         RedisTemplate<String, CacheWrapper> secondCache = selector.secondCache();
         OpenapiService.ConsistentTask consistentTask = new ConsistentTask(primaryCache, secondCache, alarm);

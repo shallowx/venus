@@ -18,8 +18,7 @@ import org.springframework.expression.spel.support.StandardEvaluationContext;
 import java.lang.reflect.Method;
 import java.util.TreeMap;
 
-import static org.venus.cache.VenusMultiLevelCacheConstants.DEFAULT_LISTENER_NAME;
-import static org.venus.cache.VenusMultiLevelCacheConstants.VENUS_REDIRECT_CACHE_NAME;
+import static org.venus.cache.MultiLevelCacheConstants.VENUS_REDIRECT_CACHE_NAME;
 
 /**
  * Aspect for handling multi-level caching functionality using VenusMultiLevelCache annotation.
@@ -39,7 +38,7 @@ public class MultiLevelCacheAspect {
      * It integrates both local and remote caching systems and facilitates cache management tasks
      * such as retrieving caches based on the configured properties.
      */
-    private VenusMultiLevelCacheManager manager;
+    private MultiLevelCacheManager manager;
     /**
      * The Callback instance used to handle multi-level cache events.
      * This variable will manage the custom actions that should be performed
@@ -53,7 +52,7 @@ public class MultiLevelCacheAspect {
      * multi-level caching operations, which include actions such as
      * putting, evicting, and fetching cache entries.
      */
-    @Pointcut("@annotation(org.venus.cache.VenusMultiLevelCache)")
+    @Pointcut("@annotation(org.venus.cache.MultiLevelCache)")
     public void cacheAspect() {
     }
 
@@ -80,7 +79,7 @@ public class MultiLevelCacheAspect {
             treeMap.put(paramNames[i], args[i]);
         }
 
-        VenusMultiLevelCache annotation = method.getAnnotation(VenusMultiLevelCache.class);
+        MultiLevelCache annotation = method.getAnnotation(MultiLevelCache.class);
         String elResult = parse(annotation.key(), treeMap);
         Cache cache = manager.getCache(VENUS_REDIRECT_CACHE_NAME);
 

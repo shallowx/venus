@@ -20,7 +20,7 @@ import org.venus.cache.*;
  */
 @Configuration(proxyBeanMethods = false)
 @EnableConfigurationProperties(MetricsProperties.class)
-@AutoConfigureAfter(VenusMultiLevelCacheAutoConfiguration.class)
+@AutoConfigureAfter(MultiLevelCacheAutoConfiguration.class)
 public class MetricsPrometheusAutoConfiguration {
     /**
      * Sets up the Prometheus metrics registry using the provided metrics properties.
@@ -63,11 +63,11 @@ public class MetricsPrometheusAutoConfiguration {
         return new JmxMetrics();
     }
 
-    @ConditionalOnBean(VenusMultiLevelCacheManager.class)
+    @ConditionalOnBean(MultiLevelCacheManager.class)
     @DependsOn("venusMultiLevelCacheManager")
     @Bean(initMethod = "init", destroyMethod = "shutdown")
-    public CacheMetrics cacheMetrics(VenusMultiLevelCacheManager cacheManager, MetricsProperties properties) {
-        CacheSelector selector = (VenusMultiLevelValueAdaptingCache)cacheManager.getCache(VenusMultiLevelCacheConstants.VENUS_CACHE_CALLBACK_NAME);
+    public CacheMetrics cacheMetrics(MultiLevelCacheManager cacheManager, MetricsProperties properties) {
+        CacheSelector selector = (MultiLevelValueAdaptingCache)cacheManager.getCache(MultiLevelCacheConstants.VENUS_CACHE_CALLBACK_NAME);
         Cache<String, Object> primaryCache = selector.primaryCache();
         return new CacheMetrics(primaryCache, properties.getCacheMetricsPeriod(), properties.isCacheMetricsEnabled());
     }

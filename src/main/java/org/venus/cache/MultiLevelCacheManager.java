@@ -17,7 +17,7 @@ import java.util.concurrent.TimeUnit;
  * This class implements the CacheManager interface to provide a structured
  * approach for handling cache instances.
  */
-public class VenusMultiLevelCacheManager implements CacheManager {
+public class MultiLevelCacheManager implements CacheManager {
     /**
      * A concurrent hash map used to store and manage cache instances.
      * The key is a string representing the cache name, and the value is the corresponding Cache object.
@@ -28,7 +28,7 @@ public class VenusMultiLevelCacheManager implements CacheManager {
      * Provides the configuration necessary for setting up the multi-level caching system
      * integrating both local and remote cache mechanisms.
      */
-    private final VenusMultiLevelCacheProperties properties;
+    private final MultiLevelCacheProperties properties;
     /**
      * The second level cache implemented using Redis.
      * This cache acts as the remote cache layer, extending the caching mechanism beyond the local in-memory cache.
@@ -49,7 +49,7 @@ public class VenusMultiLevelCacheManager implements CacheManager {
      * @param properties the properties used to configure the multi-level caching system
      * @param secondCache the RedisTemplate instance used for operations on the remote cache
      */
-    public VenusMultiLevelCacheManager(VenusMultiLevelCacheProperties properties, RedisTemplate<String, CacheWrapper> secondCache) {
+    public MultiLevelCacheManager(MultiLevelCacheProperties properties, RedisTemplate<String, CacheWrapper> secondCache) {
         this.properties = properties;
         this.secondCache = secondCache;
         this.primaryCache = buildCaffeineCache();
@@ -68,7 +68,7 @@ public class VenusMultiLevelCacheManager implements CacheManager {
         if (cache != null) {
             return cache;
         }
-        return caches.computeIfAbsent(name, s -> new VenusMultiLevelValueAdaptingCache(name, secondCache, primaryCache, properties));
+        return caches.computeIfAbsent(name, s -> new MultiLevelValueAdaptingCache(name, secondCache, primaryCache, properties));
     }
 
     /**
@@ -80,14 +80,14 @@ public class VenusMultiLevelCacheManager implements CacheManager {
      */
     private com.github.benmanes.caffeine.cache.Cache<String, Object> buildCaffeineCache() {
         Caffeine<Object, Object> caffeineBuilder = Caffeine.newBuilder();
-        Optional<VenusMultiLevelCacheProperties> opt = Optional.ofNullable(this.properties);
-        opt.map(VenusMultiLevelCacheProperties::getInitCapacity)
+        Optional<MultiLevelCacheProperties> opt = Optional.ofNullable(this.properties);
+        opt.map(MultiLevelCacheProperties::getInitCapacity)
                 .ifPresent(caffeineBuilder::initialCapacity);
-        opt.map(VenusMultiLevelCacheProperties::getMaxCapacity)
+        opt.map(MultiLevelCacheProperties::getMaxCapacity)
                 .ifPresent(caffeineBuilder::maximumSize);
-        opt.map(VenusMultiLevelCacheProperties::getExpireAfterAccess)
+        opt.map(MultiLevelCacheProperties::getExpireAfterAccess)
                 .ifPresent(eaa -> caffeineBuilder.expireAfterAccess(eaa, TimeUnit.MILLISECONDS));
-        opt.map(VenusMultiLevelCacheProperties::getExpireAfterWrite)
+        opt.map(MultiLevelCacheProperties::getExpireAfterWrite)
                 .ifPresent(eaa -> caffeineBuilder.expireAfterWrite(eaa, TimeUnit.MILLISECONDS));
         return caffeineBuilder.recordStats().build();
     }

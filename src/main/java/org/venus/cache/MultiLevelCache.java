@@ -14,7 +14,7 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 // This annotation is used to define a multi-level cache
-public @interface VenusMultiLevelCache {
+public @interface MultiLevelCache {
     /**
      * Specifies the name of the cache.
      *

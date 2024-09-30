@@ -2,7 +2,6 @@ package org.venus.cache;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import lombok.extern.slf4j.Slf4j;
-import org.checkerframework.checker.units.qual.C;
 import org.springframework.cache.support.AbstractValueAdaptingCache;
 import org.springframework.data.redis.connection.DataType;
 import org.springframework.data.redis.core.Cursor;
@@ -11,13 +10,12 @@ import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.lang.NonNull;
 
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
-import static org.venus.cache.VenusMultiLevelCacheConstants.DEFAULT_LISTENER_NAME;
+import static org.venus.cache.MultiLevelCacheConstants.DEFAULT_LISTENER_NAME;
 
 
 /**
@@ -26,7 +24,7 @@ import static org.venus.cache.VenusMultiLevelCacheConstants.DEFAULT_LISTENER_NAM
  * from the primary (in-memory) cache and, if not found, retrieving it from the secondary (Redis) cache.
  */
 @Slf4j
-public class VenusMultiLevelValueAdaptingCache extends AbstractValueAdaptingCache implements CacheSelector {
+public class MultiLevelValueAdaptingCache extends AbstractValueAdaptingCache implements CacheSelector {
     /**
      * Represents the name of the cache.
      * This variable holds the identifier used for the cache.
@@ -48,7 +46,7 @@ public class VenusMultiLevelValueAdaptingCache extends AbstractValueAdaptingCach
      * An instance of VenusMultiLevelCacheProperties that holds the configuration
      * settings for the multi-level caching system.
      */
-    private VenusMultiLevelCacheProperties properties;
+    private MultiLevelCacheProperties properties;
 
     /**
      * Constructs a VenusMultiLevelValueAdaptingCache.
@@ -58,7 +56,7 @@ public class VenusMultiLevelValueAdaptingCache extends AbstractValueAdaptingCach
      * @param primaryCache the primary cache to be used.
      * @param properties properties for configuring the multi-level cache.
      */
-    public VenusMultiLevelValueAdaptingCache(String cacheName, RedisTemplate<String, CacheWrapper> template, Cache<String, Object> primaryCache, VenusMultiLevelCacheProperties properties) {
+    public MultiLevelValueAdaptingCache(String cacheName, RedisTemplate<String, CacheWrapper> template, Cache<String, Object> primaryCache, MultiLevelCacheProperties properties) {
         super(properties.isAllowNull());
         this.cacheName = cacheName;
         this.secondCache = template;
@@ -71,7 +69,7 @@ public class VenusMultiLevelValueAdaptingCache extends AbstractValueAdaptingCach
      *
      * @param allowNullValues - Flag to allow or disallow null values in the cache.
      */
-    protected VenusMultiLevelValueAdaptingCache(boolean allowNullValues) {
+    protected MultiLevelValueAdaptingCache(boolean allowNullValues) {
         super(allowNullValues);
     }
 
@@ -185,7 +183,7 @@ public class VenusMultiLevelValueAdaptingCache extends AbstractValueAdaptingCach
 
         String redisKey = buildKey(key);
         Optional<Long> expireOpt = Optional.ofNullable(properties)
-                .map(VenusMultiLevelCacheProperties::getRedisExpires);
+                .map(MultiLevelCacheProperties::getRedisExpires);
         if (expireOpt.isPresent()) {
             secondCache.opsForValue().set(redisKey, new CacheWrapper(redisKey, value), expireOpt.get(), TimeUnit.MILLISECONDS);
         } else {

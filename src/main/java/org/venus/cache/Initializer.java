@@ -10,7 +10,7 @@ import org.springframework.context.ApplicationContext;
  * It ensures that the ListenerSourceSupport class is properly initialized with the
  * servlet context obtained from the ApplicationContext.
  */
-public class VenusInitializer {
+public class Initializer {
     /**
      * The application context used for initializing the web application context
      * specific to Venus configurations.
@@ -25,7 +25,7 @@ public class VenusInitializer {
      *
      * @param applicationContext the ApplicationContext to be used for initialization; must not be null
      */
-    public VenusInitializer(ApplicationContext applicationContext) {
+    public Initializer(ApplicationContext applicationContext) {
         this.applicationContext = applicationContext;
     }
 

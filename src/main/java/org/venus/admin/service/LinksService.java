@@ -8,13 +8,13 @@ import org.springframework.stereotype.Service;
 import org.venus.admin.domain.LinksDao;
 import org.venus.admin.domain.LinksEntity;
 import org.venus.admin.repository.LinksRepository;
-import org.venus.openapi.OpenapiEntity;
+import org.venus.cache.ValueWrapper;
 import org.venus.support.VenusException;
 
 import java.util.List;
 import java.util.concurrent.*;
 
-import static org.venus.cache.VenusMultiLevelCacheConstants.VENUS_REDIRECT_CACHE_NAME;
+import static org.venus.cache.MultiLevelCacheConstants.VENUS_REDIRECT_CACHE_NAME;
 
 /**
  * Service class implementing the ILinksService interface.
@@ -87,14 +87,28 @@ public class LinksService implements ILinksService {
         try {
             Cache cache = cacheManager.getCache(VENUS_REDIRECT_CACHE_NAME);
             if (cache != null) {
-                cache.put(ld.getCode(), OpenapiEntity.from(ld));
+                cache.put(ld.getCode(), ValueWrapper.builder()
+                                .id(ld.getId())
+                                .code(ld.getCode())
+                                .redirect(ld.getRedirect())
+                                .expiresAt(ld.getExpiresAt())
+                                .isActive(ld.getIsActive())
+                                .originalUrl(ld.getOriginalUrl())
+                        .build());
             }
         }catch (Exception e) {
             log.error("Error while adding links to the cache", e);
             Runnable task = () -> {
                 Cache cache = cacheManager.getCache(VENUS_REDIRECT_CACHE_NAME);
                 if (cache != null) {
-                    cache.put(ld.getCode(), OpenapiEntity.from(ld));
+                    cache.put(ld.getCode(), ValueWrapper.builder()
+                            .id(ld.getId())
+                            .code(ld.getCode())
+                            .redirect(ld.getRedirect())
+                            .expiresAt(ld.getExpiresAt())
+                            .isActive(ld.getIsActive())
+                            .originalUrl(ld.getOriginalUrl())
+                            .build());
                 }
             };
             try {
@@ -128,14 +142,28 @@ public class LinksService implements ILinksService {
         try {
             Cache cache = cacheManager.getCache(VENUS_REDIRECT_CACHE_NAME);
             if (cache != null) {
-                cache.put(ld.getCode(), OpenapiEntity.from(ld));
+                cache.put(ld.getCode(), ValueWrapper.builder()
+                        .id(ld.getId())
+                        .code(ld.getCode())
+                        .redirect(ld.getRedirect())
+                        .expiresAt(ld.getExpiresAt())
+                        .isActive(ld.getIsActive())
+                        .originalUrl(ld.getOriginalUrl())
+                        .build());
             }
         } catch (Exception e) {
             log.error("Error while updating links to the cache", e);
             Runnable task = () -> {
                 Cache cache = cacheManager.getCache(VENUS_REDIRECT_CACHE_NAME);
                 if (cache != null) {
-                    cache.put(ld.getCode(), OpenapiEntity.from(ld));
+                    cache.put(ld.getCode(), ValueWrapper.builder()
+                            .id(ld.getId())
+                            .code(ld.getCode())
+                            .redirect(ld.getRedirect())
+                            .expiresAt(ld.getExpiresAt())
+                            .isActive(ld.getIsActive())
+                            .originalUrl(ld.getOriginalUrl())
+                            .build());
                 }
             };
             try {
