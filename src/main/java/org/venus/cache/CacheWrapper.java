@@ -1,6 +1,7 @@
 package org.venus.cache;
 
 import lombok.*;
+import org.springframework.data.annotation.Immutable;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -11,6 +12,7 @@ import java.util.Objects;
  * This class provides functionality for constructing cache entries, checking equality, computing
  * hash codes, and generating string representations of the cache entries.
  */
+@Immutable
 public class CacheWrapper implements Serializable {
     /**
      * Serial version UID for ensuring compatibility during the deserialization process.

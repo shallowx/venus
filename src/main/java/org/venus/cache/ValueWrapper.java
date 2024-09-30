@@ -1,6 +1,7 @@
 package org.venus.cache;
 
 import lombok.*;
+import org.springframework.data.annotation.Immutable;
 
 import java.time.LocalDateTime;
 
@@ -20,6 +21,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @EqualsAndHashCode
 @ToString
+@Immutable
 public class ValueWrapper {
     /**
      * Unique identifier for the ValueWrapper instance.
