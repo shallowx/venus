@@ -53,8 +53,8 @@ public class GenericRestApiResponse<T> extends AbstractRestApiResponse {
         GenericRestApiResponse<T> response = new GenericRestApiResponse<>();
         response.success = true;
         response.data = data;
-        response.message = VenusRestApiCode.SUCCESS.message();
-        response.code = VenusRestApiCode.SUCCESS.code();
+        response.message = RestApiCode.SUCCESS.message();
+        response.code = RestApiCode.SUCCESS.code();
         return response;
     }
 
@@ -75,7 +75,7 @@ public class GenericRestApiResponse<T> extends AbstractRestApiResponse {
      * @param message a string containing the error message
      * @return a GenericRestApiResponse with success set to false, and populated with the provided error code and message
      */
-    public static <T> GenericRestApiResponse<T> fail(VenusRestApiCode code, String message) {
+    public static <T> GenericRestApiResponse<T> fail(RestApiCode code, String message) {
         GenericRestApiResponse<T> response = new GenericRestApiResponse<>();
         response.success = false;
         response.message = message;

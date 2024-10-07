@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.venus.support.GenericRestApiResponse;
-import org.venus.support.VenusRestApiCode;
+import org.venus.support.RestApiCode;
 
 /**
  * A REST controller for handling geolocation reporting endpoints in the OpenAPI service.
@@ -51,7 +51,7 @@ public class OpenapiGeoReportRestController {
             if (log.isErrorEnabled()) {
                 log.error("Openapi report geo data failure");
             }
-            return GenericRestApiResponse.fail(VenusRestApiCode.OPENAPI_GEO_EXCEPTION, VenusRestApiCode.OPENAPI_GEO_EXCEPTION.message("Openapi report geo data failure \n" + e.getMessage()));
+            return GenericRestApiResponse.fail(RestApiCode.OPENAPI_GEO_EXCEPTION, RestApiCode.OPENAPI_GEO_EXCEPTION.message("Openapi report geo data failure \n" + e.getMessage()));
         }
     }
 }

@@ -10,7 +10,7 @@ import org.venus.admin.domain.GeoResponse;
 import org.venus.admin.service.IGeoService;
 import org.venus.support.GenericListRestApiResponse;
 import org.venus.support.GenericRestApiResponse;
-import org.venus.support.VenusRestApiCode;
+import org.venus.support.RestApiCode;
 
 /**
  * REST controller for handling geographical data.
@@ -47,7 +47,7 @@ public class GeoRestController {
             if (log.isErrorEnabled()) {
                 log.error("Error listing geo", e);
             }
-            return GenericListRestApiResponse.fail(VenusRestApiCode.VENUS_ADMIN_GEO_EXCEPTION, VenusRestApiCode.VENUS_ADMIN_GEO_EXCEPTION.message("Listing geo failed \n" + e.getMessage()));
+            return GenericListRestApiResponse.fail(RestApiCode.VENUS_ADMIN_GEO_EXCEPTION, RestApiCode.VENUS_ADMIN_GEO_EXCEPTION.message("Listing geo failed \n" + e.getMessage()));
         }
     }
 
@@ -68,7 +68,7 @@ public class GeoRestController {
             if (log.isErrorEnabled()) {
                 log.error("Error get geo's detail", e);
             }
-            return GenericRestApiResponse.fail(VenusRestApiCode.VENUS_ADMIN_GEO_EXCEPTION, VenusRestApiCode.VENUS_ADMIN_GEO_EXCEPTION.message("Get geo details \n" + e.getMessage()));
+            return GenericRestApiResponse.fail(RestApiCode.VENUS_ADMIN_GEO_EXCEPTION, RestApiCode.VENUS_ADMIN_GEO_EXCEPTION.message("Get geo details \n" + e.getMessage()));
         }
     }
 }

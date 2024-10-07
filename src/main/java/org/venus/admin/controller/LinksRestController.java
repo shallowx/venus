@@ -14,7 +14,7 @@ import org.venus.admin.domain.LinksResponse;
 import org.venus.admin.service.ILinksService;
 import org.venus.support.GenericListRestApiResponse;
 import org.venus.support.GenericRestApiResponse;
-import org.venus.support.VenusRestApiCode;
+import org.venus.support.RestApiCode;
 
 /**
  * `LinksRestController` provides REST API endpoints for managing link resources.
@@ -53,7 +53,7 @@ public class LinksRestController {
             if (log.isErrorEnabled()) {
                 log.error("Error listing links", e);
             }
-            return GenericListRestApiResponse.fail(VenusRestApiCode.VENUS_ADMIN_LINK_EXCEPTION, VenusRestApiCode.VENUS_ADMIN_LINK_EXCEPTION.message("Links links failed \n" + e.getMessage()));
+            return GenericListRestApiResponse.fail(RestApiCode.VENUS_ADMIN_LINK_EXCEPTION, RestApiCode.VENUS_ADMIN_LINK_EXCEPTION.message("Links links failed \n" + e.getMessage()));
         }
     }
 
@@ -80,7 +80,7 @@ public class LinksRestController {
             if (log.isErrorEnabled()) {
                 log.error("Error get link's detail", e);
             }
-            return GenericRestApiResponse.fail(VenusRestApiCode.VENUS_ADMIN_LINK_EXCEPTION, VenusRestApiCode.VENUS_ADMIN_LINK_EXCEPTION.message("Get links details failed \n" + e.getMessage()));
+            return GenericRestApiResponse.fail(RestApiCode.VENUS_ADMIN_LINK_EXCEPTION, RestApiCode.VENUS_ADMIN_LINK_EXCEPTION.message("Get links details failed \n" + e.getMessage()));
         }
     }
 
@@ -99,7 +99,7 @@ public class LinksRestController {
             if (log.isInfoEnabled()) {
                 log.error("Create Links failure", e);
             }
-            return GenericRestApiResponse.fail(VenusRestApiCode.VENUS_ADMIN_LINK_EXCEPTION, VenusRestApiCode.VENUS_ADMIN_LINK_EXCEPTION.message("Create links failed \n" + e.getMessage()));
+            return GenericRestApiResponse.fail(RestApiCode.VENUS_ADMIN_LINK_EXCEPTION, RestApiCode.VENUS_ADMIN_LINK_EXCEPTION.message("Create links failed \n" + e.getMessage()));
         }
     }
 
@@ -118,7 +118,7 @@ public class LinksRestController {
             if (log.isInfoEnabled()) {
                 log.error("Update Links failure", e);
             }
-            return GenericRestApiResponse.fail(VenusRestApiCode.VENUS_ADMIN_LINK_EXCEPTION, VenusRestApiCode.VENUS_ADMIN_LINK_EXCEPTION.message("Update links failed \n" + e.getMessage()));
+            return GenericRestApiResponse.fail(RestApiCode.VENUS_ADMIN_LINK_EXCEPTION, RestApiCode.VENUS_ADMIN_LINK_EXCEPTION.message("Update links failed \n" + e.getMessage()));
         }
     }
 
@@ -143,7 +143,7 @@ public class LinksRestController {
                 log.error("Delete links[id:{}] failure", id, e);
             }
 
-            return GenericRestApiResponse.fail(VenusRestApiCode.VENUS_ADMIN_LINK_EXCEPTION, VenusRestApiCode.VENUS_ADMIN_LINK_EXCEPTION.message("Delete links failed \n" + e.getMessage()));
+            return GenericRestApiResponse.fail(RestApiCode.VENUS_ADMIN_LINK_EXCEPTION, RestApiCode.VENUS_ADMIN_LINK_EXCEPTION.message("Delete links failed \n" + e.getMessage()));
         }
     }
 }

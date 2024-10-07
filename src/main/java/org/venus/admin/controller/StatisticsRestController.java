@@ -10,7 +10,7 @@ import org.venus.admin.domain.StatisticsResponse;
 import org.venus.admin.service.IStatisticsService;
 import org.venus.support.GenericListRestApiResponse;
 import org.venus.support.GenericRestApiResponse;
-import org.venus.support.VenusRestApiCode;
+import org.venus.support.RestApiCode;
 
 /**
  * REST controller for handling statistics-related endpoints.
@@ -45,7 +45,7 @@ public class StatisticsRestController {
             if (log.isErrorEnabled()) {
                 log.error("Error listing statistics", e);
             }
-            return GenericListRestApiResponse.fail(VenusRestApiCode.VENUS_ADMIN_STATISTICS_EXCEPTION, VenusRestApiCode.VENUS_ADMIN_STATISTICS_EXCEPTION.message("Listing statistics failed \n" + e.getMessage()));
+            return GenericListRestApiResponse.fail(RestApiCode.VENUS_ADMIN_STATISTICS_EXCEPTION, RestApiCode.VENUS_ADMIN_STATISTICS_EXCEPTION.message("Listing statistics failed \n" + e.getMessage()));
         }
     }
 
@@ -65,7 +65,7 @@ public class StatisticsRestController {
             if (log.isErrorEnabled()) {
                 log.error("Error get statistics detail", e);
             }
-            return GenericRestApiResponse.fail(VenusRestApiCode.VENUS_ADMIN_STATISTICS_EXCEPTION, VenusRestApiCode.VENUS_ADMIN_STATISTICS_EXCEPTION.message("Get statistics detail failed \n" + e.getMessage()));
+            return GenericRestApiResponse.fail(RestApiCode.VENUS_ADMIN_STATISTICS_EXCEPTION, RestApiCode.VENUS_ADMIN_STATISTICS_EXCEPTION.message("Get statistics detail failed \n" + e.getMessage()));
         }
     }
 }

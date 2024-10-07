@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.venus.support.GenericRestApiResponse;
-import org.venus.support.VenusRestApiCode;
+import org.venus.support.RestApiCode;
 
 /**
  * OpenapiStatisticsReportRestController is a REST controller for handling OpenAPI statistics reporting.
@@ -48,7 +48,7 @@ public class OpenapiStatisticsReportRestController {
             if (log.isErrorEnabled()) {
                 log.error("Openapi report statistics data failure");
             }
-            return GenericRestApiResponse.fail(VenusRestApiCode.OPENAPI_STATISTICS_EXCEPTION, VenusRestApiCode.OPENAPI_STATISTICS_EXCEPTION.message("Openapi report statistics data failure \n" + e.getMessage()));
+            return GenericRestApiResponse.fail(RestApiCode.OPENAPI_STATISTICS_EXCEPTION, RestApiCode.OPENAPI_STATISTICS_EXCEPTION.message("Openapi report statistics data failure \n" + e.getMessage()));
         }
     }
 }

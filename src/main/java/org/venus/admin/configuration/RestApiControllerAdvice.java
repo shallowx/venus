@@ -15,7 +15,7 @@ import org.venus.admin.annotation.RestApiList;
 import org.venus.support.GenericListRestApiResponse;
 import org.venus.support.GenericRestApiResponse;
 import org.venus.support.VenusException;
-import org.venus.support.VenusRestApiCode;
+import org.venus.support.RestApiCode;
 
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -77,9 +77,9 @@ public class RestApiControllerAdvice {
         }
         HandlerMethod handlerMethod = (HandlerMethod) request.getAttribute(HandlerMapping.BEST_MATCHING_HANDLER_ATTRIBUTE);
         if (handlerMethod != null && handlerMethod.hasMethodAnnotation(RestApiList.class)) {
-            return GenericListRestApiResponse.fail(VenusRestApiCode.BAD_REQUEST, errorMessage);
+            return GenericListRestApiResponse.fail(RestApiCode.BAD_REQUEST, errorMessage);
         } else {
-            return GenericRestApiResponse.fail(VenusRestApiCode.BAD_REQUEST, errorMessage);
+            return GenericRestApiResponse.fail(RestApiCode.BAD_REQUEST, errorMessage);
         }
     }
 
@@ -98,9 +98,9 @@ public class RestApiControllerAdvice {
         HandlerMethod handlerMethod = (HandlerMethod) request.getAttribute(HandlerMapping.BEST_MATCHING_HANDLER_ATTRIBUTE);
         String message = "Required request body is missing";
         if (handlerMethod != null && handlerMethod.hasMethodAnnotation(RestApiList.class)) {
-            return GenericListRestApiResponse.fail(VenusRestApiCode.BAD_REQUEST, message);
+            return GenericListRestApiResponse.fail(RestApiCode.BAD_REQUEST, message);
         } else {
-            return GenericRestApiResponse.fail(VenusRestApiCode.BAD_REQUEST, message);
+            return GenericRestApiResponse.fail(RestApiCode.BAD_REQUEST, message);
         }
     }
 
@@ -115,7 +115,7 @@ public class RestApiControllerAdvice {
         if (log.isErrorEnabled()) {
             log.error("Method argument not valid exception", e);
         }
-        return GenericRestApiResponse.fail(VenusRestApiCode.BAD_REQUEST, "Method argument not valid exception");
+        return GenericRestApiResponse.fail(RestApiCode.BAD_REQUEST, "Method argument not valid exception");
     }
 
 
@@ -134,9 +134,9 @@ public class RestApiControllerAdvice {
         }
         HandlerMethod handlerMethod = (HandlerMethod) request.getAttribute(HandlerMapping.BEST_MATCHING_HANDLER_ATTRIBUTE);
         if (handlerMethod != null && handlerMethod.hasMethodAnnotation(RestApiList.class)) {
-            return GenericListRestApiResponse.fail(VenusRestApiCode.VENUS_ADMIN_EXCEPTION, e.getMessage());
+            return GenericListRestApiResponse.fail(RestApiCode.VENUS_ADMIN_EXCEPTION, e.getMessage());
         } else {
-            return GenericRestApiResponse.fail(VenusRestApiCode.VENUS_ADMIN_EXCEPTION, e.getMessage());
+            return GenericRestApiResponse.fail(RestApiCode.VENUS_ADMIN_EXCEPTION, e.getMessage());
         }
     }
 
@@ -152,6 +152,6 @@ public class RestApiControllerAdvice {
         if (log.isErrorEnabled()) {
             log.error("path:{} - bad request", request.getRequestURL(), e);
         }
-        return GenericRestApiResponse.fail(VenusRestApiCode.BAD_REQUEST, VenusRestApiCode.BAD_REQUEST.message(e.getMessage()));
+        return GenericRestApiResponse.fail(RestApiCode.BAD_REQUEST, RestApiCode.BAD_REQUEST.message(e.getMessage()));
     }
 }

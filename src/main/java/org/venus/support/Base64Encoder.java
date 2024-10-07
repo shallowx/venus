@@ -12,7 +12,7 @@ import org.venus.admin.service.Encoder;
  * into a base62 string representation.
  */
 @Slf4j
-public class VenusBase62Encoder implements Encoder {
+public class Base64Encoder implements Encoder {
     /**
      * Singleton instance of DefaultBase62Encoder.
      *
@@ -20,7 +20,7 @@ public class VenusBase62Encoder implements Encoder {
      * the predefined base62 characters [0-9], [a-z], and [A-Z]. It ensures a single,
      * globally accessible instance of the encoder.
      */
-    public static final VenusBase62Encoder INSTANCE = new VenusBase62Encoder();
+    public static final Base64Encoder INSTANCE = new Base64Encoder();
 
     /**
      * Creates a private constructor for the DefaultBase62Encoder class.
@@ -29,7 +29,7 @@ public class VenusBase62Encoder implements Encoder {
      * instance of DefaultBase62Encoder can be created. It restricts instantiation from
      * outside the class, allowing only the provided static instance to be used.
      */
-    private VenusBase62Encoder() {
+    private Base64Encoder() {
     }
 
     /**
@@ -41,7 +41,7 @@ public class VenusBase62Encoder implements Encoder {
             'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
             'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f',
             'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v',
-            'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'
+            'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+','-'
     };
     /**
      * Constant that defines the number of encoded characters available.
@@ -70,7 +70,8 @@ public class VenusBase62Encoder implements Encoder {
         if (input == 0) {
             return String.valueOf(ENCODE_CHARS[0]);
         }
-        var encode = new StringBuilder();
+        int estimatedCapacity = (int) (Math.log(input) / Math.log(SPEED)) + 1;
+        var encode = new StringBuilder(estimatedCapacity);
         while (input > 0) {
             encode.append(ENCODE_CHARS[(int) (input & MASK)]);
             input >>= 6;

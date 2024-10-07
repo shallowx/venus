@@ -16,7 +16,7 @@ package org.venus.support;
  * - message: Returns the message associated with the enum constant.
  * - of: Converts an integer code to its corresponding VenusRestApiCode enum constant, or null if no match is found.
  */
-public enum VenusRestApiCode {
+public enum RestApiCode {
     /**
      * Indicates that the request was successful.
      * Associated with the HTTP status code 200.
@@ -97,7 +97,7 @@ public enum VenusRestApiCode {
      * @param code the integer code associated with this instance
      * @param message the message associated with this instance
      */
-    VenusRestApiCode(int code, String message) {
+    RestApiCode(int code, String message) {
         this.code = code;
         this.message = message;
     }
@@ -130,8 +130,8 @@ public enum VenusRestApiCode {
      * @param code the integer code to be converted
      * @return the VenusRestApiCode corresponding to the provided code, or null if no match is found
      */
-    public static VenusRestApiCode of(int code) {
-        for (VenusRestApiCode httpCode : VenusRestApiCode.values()) {
+    public static RestApiCode of(int code) {
+        for (RestApiCode httpCode : RestApiCode.values()) {
             if (httpCode.code() == code) {
                 return httpCode;
             }

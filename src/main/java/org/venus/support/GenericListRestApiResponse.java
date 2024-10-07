@@ -55,8 +55,8 @@ public class GenericListRestApiResponse<T> extends AbstractRestApiResponse {
         GenericListRestApiResponse<T> response = new GenericListRestApiResponse<>();
         response.success = true;
         response.data = data;
-        response.message = VenusRestApiCode.SUCCESS.message();
-        response.code = VenusRestApiCode.SUCCESS.code();
+        response.message = RestApiCode.SUCCESS.message();
+        response.code = RestApiCode.SUCCESS.code();
         return response;
     }
 
@@ -78,7 +78,7 @@ public class GenericListRestApiResponse<T> extends AbstractRestApiResponse {
      * @param message a descriptive message providing more details about the failure
      * @return a {@code GenericListRestApiResponse} indicating the failure, containing the specified error code and message
      */
-    public static <T> GenericListRestApiResponse<T> fail(VenusRestApiCode code, String message) {
+    public static <T> GenericListRestApiResponse<T> fail(RestApiCode code, String message) {
         GenericListRestApiResponse<T> response = new GenericListRestApiResponse<>();
         response.success = false;
         response.message = message;

@@ -18,7 +18,7 @@ import org.venus.cache.ValueWrapper;
 import org.venus.metrics.MetricsConstants;
 import org.venus.support.GenericListRestApiResponse;
 import org.venus.support.GenericRestApiResponse;
-import org.venus.support.VenusRestApiCode;
+import org.venus.support.RestApiCode;
 
 import java.net.URI;
 import java.util.concurrent.ConcurrentHashMap;
@@ -121,7 +121,7 @@ public class OpenapiRestController {
             if (log.isErrorEnabled()) {
                 log.error("Get venus openapi original-url and url-encode mapping entity failure", e);
             }
-            return GenericRestApiResponse.fail(VenusRestApiCode.OPENAPI_EXCEPTION, VenusRestApiCode.OPENAPI_EXCEPTION.message("Get venus openapi original-url and url-encode mapping entity failure \n" + e.getMessage()));
+            return GenericRestApiResponse.fail(RestApiCode.OPENAPI_EXCEPTION, RestApiCode.OPENAPI_EXCEPTION.message("Get venus openapi original-url and url-encode mapping entity failure \n" + e.getMessage()));
         }
     }
 
@@ -141,7 +141,7 @@ public class OpenapiRestController {
             if (log.isErrorEnabled()) {
                 log.error("List venus openapi redirect uri failure", e);
             }
-            return GenericListRestApiResponse.fail(VenusRestApiCode.OPENAPI_EXCEPTION, VenusRestApiCode.OPENAPI_EXCEPTION.message("List venus openapi redirect uri failure \n" + e.getMessage()));
+            return GenericListRestApiResponse.fail(RestApiCode.OPENAPI_EXCEPTION, RestApiCode.OPENAPI_EXCEPTION.message("List venus openapi redirect uri failure \n" + e.getMessage()));
         }
     }
 
