@@ -145,6 +145,23 @@ public class CacheWrapper implements Serializable {
         return hash;
     }
 
+
+    @Serial
+    private void writeObject(java.io.ObjectOutputStream out) throws IOException {
+        out.defaultWriteObject();
+        out.writeObject(key);
+        out.writeObject(value);
+    }
+
+    @Serial
+    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
+        in.defaultReadObject();
+        String key = (String) in.readObject();
+        Object o = in.readObject();
+        this.value = unmaskNullValues(o);
+        this.key = key;
+    }
+
     /**
      * Generates a string representation of the CacheWrapper containing the key and value.
      *
