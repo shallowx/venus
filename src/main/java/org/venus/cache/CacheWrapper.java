@@ -3,6 +3,7 @@ package org.venus.cache;
 import lombok.*;
 import org.springframework.data.annotation.Immutable;
 
+import java.io.IOException;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Objects;
@@ -142,6 +143,23 @@ public class CacheWrapper implements Serializable {
     @Override
     public int hashCode() {
         return hash;
+    }
+
+
+    @Serial
+    private void writeObject(java.io.ObjectOutputStream out) throws IOException {
+        out.defaultWriteObject();
+        out.writeObject(key);
+        out.writeObject(value);
+    }
+
+    @Serial
+    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
+        in.defaultReadObject();
+        String key = (String) in.readObject();
+        Object o = in.readObject();
+        this.value = unmaskNullValues(o);
+        this.key = key;
     }
 
     /**
