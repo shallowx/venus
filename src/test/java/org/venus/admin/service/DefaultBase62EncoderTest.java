@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class DefaultBase62EncoderTest {
 
     // Instance of class to test
-    private Base64Encoder encoder = Base64Encoder.INSTANCE;
+    private final Base64Encoder encoder = Base64Encoder.INSTANCE;
 
     @Test
     public void testEncodeWithZeroInput() {

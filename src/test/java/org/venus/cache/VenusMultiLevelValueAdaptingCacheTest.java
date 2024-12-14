@@ -16,17 +16,16 @@ import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for the `VenusMultiLevelValueAdaptingCache` class.
- *
  * This test class contains methods to verify the functionality and correctness of the
  * `VenusMultiLevelValueAdaptingCache` implementation, particularly focusing on lookup,
  * get, put, and evict operations in a multi-level caching system.
  */
+@SuppressWarnings("all")
 public class VenusMultiLevelValueAdaptingCacheTest {
 
     /**
      * Tests the `lookup` method of `VenusMultiLevelValueAdaptingCache` to verify that a `CacheWrapper`
      * object can be successfully retrieved from the primary cache.
-     *
      * This method performs the following steps:
      * 1. Mocks the primary cache and the secondary Redis cache.
      * 2. Sets up the `VenusMultiLevelCacheProperties` with the property `allowNull` set to true.
@@ -36,7 +35,7 @@ public class VenusMultiLevelValueAdaptingCacheTest {
      * 6. Asserts that the result is not null, is an instance of `CacheWrapper`, and equals the expected `CacheWrapper`.
      */
     @Test
-    void test_lookup_CacheWrapperFromPrimaryCache() {
+    void testLookupCacheWrapperFromPrimaryCache() {
         String key = "key1";
         Cache<String, Object> primaryCache = Mockito.mock(Cache.class);
         RedisTemplate<String, CacheWrapper> secondCache = Mockito.mock(RedisTemplate.class);
@@ -60,7 +59,6 @@ public class VenusMultiLevelValueAdaptingCacheTest {
      * Tests the functionality of `lookup` method within the `VenusMultiLevelValueAdaptingCache`
      * class. The test specifically verifies that when a cache miss occurs in the primary cache,
      * the method correctly retrieves the `CacheWrapper` object from the secondary cache.
-     *
      * The setup involves:
      * 1. Creating a mock primary cache and a mock RedisTemplate as the secondary cache.
      * 2. Setting up properties to allow null values.
@@ -68,14 +66,13 @@ public class VenusMultiLevelValueAdaptingCacheTest {
      * 4. Mocking the primary cache to return null, indicating a cache miss.
      * 5. Mocking the secondary cache to return the expected `CacheWrapper` object.
      * 6. Invoking the `lookup` method and asserting that the result matches the expected `CacheWrapper` object.
-     *
      * Test assertions:
      * - The result is not null.
      * - The result is an instance of `CacheWrapper`.
      * - The result equals the expected `CacheWrapper` object.
      */
     @Test
-    void test_lookup_CacheWrapperFromSecondCache() {
+    void testLookupCacheWrapperFromSecondCache() {
         String key = "key1";
         Cache<String, Object> primaryCache = Mockito.mock(Cache.class);
         RedisTemplate<String, CacheWrapper> secondCache = Mockito.mock(RedisTemplate.class);
@@ -101,11 +98,9 @@ public class VenusMultiLevelValueAdaptingCacheTest {
     /**
      * Test method to verify the behavior of the `lookup` method of `VenusMultiLevelValueAdaptingCache`
      * when no cache wrapper is found in either the primary or secondary caches.
-     *
      * This test initializes the necessary objects and mocks their behavior to simulate the scenario
      * where both the primary and secondary caches return null for a given key. It then asserts
      * that the result of the `lookup` method is null, confirming the expected behavior.
-     *
      * Steps performed in this test:
      * 1. Mock instances of primary and secondary caches are created.
      * 2. `VenusMultiLevelCacheProperties` is configured to allow null values.
@@ -115,7 +110,7 @@ public class VenusMultiLevelValueAdaptingCacheTest {
      * 6. The result is asserted to be null.
      */
     @Test
-    void test_lookup_NoCacheWrapperInBothCaches() {
+    void testLookupNoCacheWrapperInBothCaches() {
         String key = "key1";
         Cache<String, Object> primaryCache = Mockito.mock(Cache.class);
         RedisTemplate<String, CacheWrapper> secondCache = Mockito.mock(RedisTemplate.class);
@@ -136,7 +131,6 @@ public class VenusMultiLevelValueAdaptingCacheTest {
     }
     /**
      * Tests the behavior of the `VenusMultiLevelValueAdaptingCache` when a cache hit occurs in the primary cache.
-     *
      * This test verifies that the value is correctly retrieved from the primary cache when it is present.
      * It mocks the primary cache and secondary cache, uses a sample key-value pair, and confirms that
      * the returned value matches the expected value.
@@ -144,7 +138,7 @@ public class VenusMultiLevelValueAdaptingCacheTest {
      * @throws Exception if an unexpected error occurs during the test execution
      */
     @Test
-    void test_get_WithHitInCache() throws Exception {
+    void testGetWithHitInCache() throws Exception {
         String key = "key1";
         String value = "value1";
         Cache<String, Object> primaryCache = Mockito.mock(Cache.class);
@@ -172,7 +166,7 @@ public class VenusMultiLevelValueAdaptingCacheTest {
      * @throws Exception if any error occurs during the test execution.
      */
     @Test
-    void test_get_WithMissInCache() throws Exception {
+    void testGetWithMissInCache() throws Exception {
         String key = "key1";
         String value = "value1";
         Cache<String, Object> primaryCache = Mockito.mock(Cache.class);
@@ -212,7 +206,7 @@ public class VenusMultiLevelValueAdaptingCacheTest {
      * @throws UnknownHostException if an unknown host is encountered during the test
      */
     @Test
-    void test_put_WithValueNotNull() throws UnknownHostException {
+    void testPutWithValueNotNull() throws UnknownHostException {
         String key = "key1";
         String value = "value1";
         Cache<String, Object> primaryCache = Mockito.mock(Cache.class);
@@ -232,7 +226,6 @@ public class VenusMultiLevelValueAdaptingCacheTest {
 
     /**
      * Verifies the behavior of the `put` method when a `null` value is provided and `null` values are not allowed by cache settings.
-     *
      * This test ensures that:
      * - When a `null` value is provided and the cache configuration has `allowNull` set to `false`:
      *   - The `put` method on the primary cache is not called.
@@ -241,7 +234,7 @@ public class VenusMultiLevelValueAdaptingCacheTest {
      * @throws UnknownHostException If an error occurs related to the host environment.
      */
     @Test
-    void test_put_WithNullValueAndNullNotAllowed() throws UnknownHostException {
+    void testPutWithNullValueAndNullNotAllowed() throws UnknownHostException {
         String key = "key1";
         String value = null;
         Cache<String, Object> primaryCache = Mockito.mock(Cache.class);
@@ -271,7 +264,7 @@ public class VenusMultiLevelValueAdaptingCacheTest {
      * @throws UnknownHostException if there is an error initializing the mock environment for the test
      */
     @Test
-    void test_evict_validKey() throws UnknownHostException {
+    void testEvictValidKey() throws UnknownHostException {
         String key = "key1";
         Cache<String, Object> primaryCache = Mockito.mock(Cache.class);
         RedisTemplate<String, CacheWrapper> secondCache = Mockito.mock(RedisTemplate.class);
@@ -293,13 +286,12 @@ public class VenusMultiLevelValueAdaptingCacheTest {
 
     /**
      * Tests the eviction of a cache entry with an invalid key in the multi-level cache system.
-     *
      * The test verifies that attempting to evict an entry using an invalid key ('key2'):
      * - Invokes the `invalidate` method on the primary cache.
      * - Invokes the `delete` method on the secondary Redis cache with a prefixed key.
      */
     @Test
-    void test_evict_invalidKey() {
+    void testEvictInvalidKey() {
         String key = "key2";
         Cache<String, Object> primaryCache = Mockito.mock(Cache.class);
         RedisTemplate<String, CacheWrapper> secondCache = Mockito.mock(RedisTemplate.class);
